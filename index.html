@@ -1,2791 +1,1520 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
-
-<title>StudyNotes</title>
-
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --bg: #101010;
-    --panel: #111111;
-    --panel-2: #1c1c1c;
-    --panel-3: #202020;
-    --border: #292929;
-    --border-light: #353535;
-    --text: #f3f3f3;
-    --muted: #858585;
-    --muted-2: #5d5d5d;
-    --white: #f5f5f5;
-}
-
-html,
-body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: var(--bg);
-    color: var(--text);
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        "SF Pro Text",
-        Inter,
-        Helvetica,
-        Arial,
-        sans-serif;
-}
-
-button,
-input,
-textarea {
-    font: inherit;
-}
-
-button {
-    border: 0;
-    background: none;
-    color: inherit;
-}
-
-button,
-.note-item,
-.folder-item {
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* =========================
-   APP
-========================= */
-
-.app {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    background: var(--bg);
-}
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.sidebar {
-    width: 488px;
-    min-width: 488px;
-    height: 100%;
-    border-right: 1px solid var(--border);
-    background: #111111;
-    display: flex;
-    flex-direction: column;
-    transition:
-        width .38s cubic-bezier(.2,.8,.2,1),
-        min-width .38s cubic-bezier(.2,.8,.2,1),
-        opacity .25s ease;
-    overflow: hidden;
-    z-index: 10;
-}
-
-.sidebar.collapsed {
-    width: 0;
-    min-width: 0;
-    border-right: 0;
-    opacity: 0;
-}
-
-/* sidebar header */
-
-.sidebar-header {
-    height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 32px;
-    flex-shrink: 0;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo-mark {
-    width: 34px;
-    height: 34px;
-    border: 2px solid #d7d7d7;
-    border-radius: 50%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logo-mark::before {
-    content: "";
-    width: 14px;
-    height: 14px;
-    background: #d7d7d7;
-    border-radius: 50%;
-}
-
-.logo-mark::after {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 1px solid #4d4d4d;
-    border-radius: 50%;
-}
-
-.logo-text {
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.7px;
-}
-
-.collapse-btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 13px;
-    background: #292929;
-    border: 1px solid #303030;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background .2s ease, transform .2s ease;
-}
-
-.collapse-btn:hover {
-    background: #333;
-}
-
-.collapse-btn:active {
-    transform: scale(.94);
-}
-
-.collapse-icon {
-    width: 21px;
-    height: 21px;
-    border: 2px solid #999;
-    border-radius: 2px;
-    position: relative;
-}
-
-.collapse-icon::after {
-    content: "";
-    position: absolute;
-    top: 3px;
-    left: 5px;
-    width: 2px;
-    height: 11px;
-    background: #999;
-}
-
-/* space */
-
-.space-section {
-    padding: 25px 32px 0;
-}
-
-.space-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 25px;
-}
-
-.space-title {
-    font-size: 13px;
-    color: #7b7b7b;
-    letter-spacing: 1.6px;
-    font-weight: 600;
-}
-
-.add-folder {
-    width: 25px;
-    height: 25px;
-    border: 2px solid #cfcfcf;
-    border-radius: 50%;
-    font-size: 18px;
-    line-height: 18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.add-folder:hover {
-    background: #292929;
-}
-
-/* folders */
-
-.folder-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.folder-item {
-    min-height: 58px;
-    border-radius: 10px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    cursor: pointer;
-    color: #969696;
-    transition:
-        background .2s ease,
-        color .2s ease,
-        transform .15s ease;
-}
-
-.folder-item:hover {
-    background: #181818;
-    color: #ddd;
-}
-
-.folder-item.active {
-    background: #202020;
-    color: #e6e6e6;
-}
-
-.folder-icon {
-    width: 22px;
-    height: 18px;
-    border: 2px solid currentColor;
-    border-radius: 3px;
-    position: relative;
-    flex-shrink: 0;
-}
-
-.folder-icon::before {
-    content: "";
-    position: absolute;
-    width: 8px;
-    height: 4px;
-    left: -2px;
-    top: -6px;
-    border: 2px solid currentColor;
-    border-bottom: 0;
-    border-radius: 3px 3px 0 0;
-}
-
-.folder-name {
-    flex: 1;
-    font-size: 17px;
-}
-
-.folder-count {
-    color: #777;
-    font-size: 14px;
-}
-
-.folder-edit {
-    opacity: 0;
-    cursor: pointer;
-    color: #999;
-    transition: opacity .2s ease;
-}
-
-.folder-item:hover .folder-edit {
-    opacity: 1;
-}
-
-/* notes section */
-
-.notes-section {
-    margin: 20px 20px 0;
-    border-top: 1px solid #2b2b2b;
-    padding: 28px 16px 0;
-    flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.notes-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-}
-
-.notes-title {
-    font-size: 37px;
-    letter-spacing: -1.5px;
-    font-weight: 500;
-}
-
-.notes-count {
-    color: #777;
-    font-size: 15px;
-    margin-bottom: 30px;
-}
-
-.new-note-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 14px;
-    background: #f2f2f2;
-    color: #171717;
-    font-size: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 8px 30px rgba(255,255,255,.08);
-    transition:
-        transform .2s ease,
-        background .2s ease;
-}
-
-.new-note-btn:hover {
-    background: white;
-    transform: translateY(-2px);
-}
-
-.new-note-btn:active {
-    transform: scale(.94);
-}
-
-/* search */
-
-.search-box {
-    height: 57px;
-    border: 1px solid #3a3a3a;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    margin-bottom: 20px;
-    background: #151515;
-    transition: border .2s ease;
-}
-
-.search-box:focus-within {
-    border-color: #656565;
-}
-
-.search-icon {
-    color: #8b8b8b;
-    font-size: 25px;
-    margin-right: 13px;
-}
-
-.search-box input {
-    background: transparent;
-    border: 0;
-    outline: 0;
-    color: white;
-    width: 100%;
-    font-size: 16px;
-}
-
-.search-box input::placeholder {
-    color: #777;
-}
-
-/* note list */
-
-.note-list {
-    overflow-y: auto;
-    flex: 1;
-    padding-right: 4px;
-}
-
-.note-list::-webkit-scrollbar {
-    width: 5px;
-}
-
-.note-list::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 5px;
-}
-
-.note-item {
-    padding: 17px 14px;
-    border-radius: 10px;
-    margin-bottom: 5px;
-    cursor: pointer;
-    transition: background .2s ease;
-}
-
-.note-item:hover {
-    background: #1b1b1b;
-}
-
-.note-item.active {
-    background: #232323;
-}
-
-.note-item-title {
-    font-size: 17px;
-    margin-bottom: 7px;
-}
-
-.note-item-preview {
-    color: #777;
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.note-item-time {
-    margin-top: 8px;
-    color: #555;
-    font-size: 12px;
-}
-
-/* empty notes */
-
-.empty-notes {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #ddd;
-    padding-bottom: 70px;
-}
-
-.empty-icon {
-    width: 55px;
-    height: 55px;
-    border: 1px dashed #454545;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    color: #aaa;
-}
-
-.empty-title {
-    font-size: 19px;
-    margin-bottom: 13px;
-}
-
-.empty-subtitle {
-    color: #777;
-    font-size: 14px;
-    margin-bottom: 28px;
-}
-
-.write-link {
-    color: #ddd;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-/* =========================
-   MAIN
-========================= */
-
-.main {
-    flex: 1;
-    min-width: 0;
-    height: 100%;
-    position: relative;
-    background: #111111;
-}
-
-/* reopen button */
-
-.reopen-btn {
-    position: absolute;
-    left: 35px;
-    top: 32px;
-    width: 56px;
-    height: 56px;
-    background: #292929;
-    border: 1px solid #303030;
-    border-radius: 13px;
-    color: #999;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 5;
-}
-
-.sidebar.collapsed ~ .main .reopen-btn {
-    display: flex;
-}
-
-/* empty main */
-
-.empty-main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    transition: opacity .3s ease;
-}
-
-.orbit {
-    width: 180px;
-    height: 180px;
-    position: relative;
-    margin-bottom: 22px;
-}
-
-.orbit-ring {
-    position: absolute;
-    width: 175px;
-    height: 82px;
-    border: 1px solid #555;
-    border-radius: 50%;
-    left: 2px;
-    top: 47px;
-    transform: rotate(58deg);
-}
-
-.orbit-ring.two {
-    transform: rotate(-45deg);
-}
-
-.orbit-dot {
-    position: absolute;
-    width: 27px;
-    height: 27px;
-    border-radius: 50%;
-    background: #f0f0f0;
-    left: 76px;
-    top: 77px;
-    box-shadow:
-        0 0 0 13px rgba(255,255,255,.06),
-        0 0 0 1px #292929;
-}
-
-.empty-main h1 {
-    font-size: 28px;
-    font-weight: 500;
-    letter-spacing: -.7px;
-    margin-bottom: 18px;
-}
-
-.empty-main p {
-    color: #777;
-    font-size: 16px;
-    margin-bottom: 30px;
-}
-
-.main-new-note {
-    background: #242424;
-    border: 1px solid #303030;
-    padding: 15px 27px;
-    border-radius: 12px;
-    font-size: 17px;
-    cursor: pointer;
-    transition: background .2s ease, transform .2s ease;
-}
-
-.main-new-note:hover {
-    background: #2c2c2c;
-}
-
-.main-new-note:active {
-    transform: scale(.96);
-}
-
-/* =========================
-   EDITOR
-========================= */
-
-.editor {
-    width: 100%;
-    height: 100%;
-    display: none;
-    flex-direction: column;
-    animation: editorIn .3s ease;
-}
-
-@keyframes editorIn {
-    from {
-        opacity: 0;
-        transform: translateY(7px);
+import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import { dataDir } from "./data.js";
+const secretFile = path.join(dataDir, "identity-secret");
+function loadSecret() {
+  if (process.env.IDENTITY_SECRET) return process.env.IDENTITY_SECRET;
+  try {
+    return fs.readFileSync(secretFile, "utf8").trim();
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    const generated = crypto.randomBytes(32).toString("hex");
+    fs.mkdirSync(path.dirname(secretFile), { recursive: true });
+    fs.writeFileSync(secretFile, generated, { mode: 0o600 });
+    return generated;
+  }
+}
+const SECRET = loadSecret();
+const encode = (value) => Buffer.from(value).toString("base64url");
+export function issueToken(playerId) {
+  const payload = encode(JSON.stringify({ playerId, issuedAt: Date.now() }));
+  const signature = crypto.createHmac("sha256", SECRET).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+export function verifyToken(token) {
+  if (typeof token !== "string") return null;
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+  const [payload, signature] = parts;
+  if (!payload || !signature) return null;
+  const expected = Buffer.from(crypto.createHmac("sha256", SECRET).update(payload).digest("base64url"));
+  const provided = Buffer.from(signature);
+  if (provided.length !== expected.length || !crypto.timingSafeEqual(provided, expected)) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString());
+    return typeof parsed.playerId === "string" ? parsed.playerId : null;
+  } catch {
+    return null;
+  }
+}import path from "node:path";
+export const dataDir = path.resolve(process.env.DATA_DIR || "data");import crypto from "node:crypto";
+import {
+  BODY_DAMAGE, ENEMY_ATTACK_RANGE, ENEMY_RADIUS, ENEMY_WINDUP_MS, HEADSHOT_DAMAGE, MAG_SIZE,
+  PLAYER_MAX_HEALTH, PLAYER_MAX_MOVE_SPEED, RELOAD_MS, RESPAWN_MS, SPAWN_PROTECTION_MS,
+  TACTICAL_RELOAD_MS,
+  canOccupyPosition, canTraverse, chooseEnemyStep, enemyStats, getMapObstacles,
+  hasLineOfSight, rayObstacleHit, raySphereHit, validPosition, waveEnemyCount,
+  xpForMatch
+} from "../shared/gameplay.js";
+const v = (x = 0, y = 0, z = 0) => ({ x, y, z });
+const spawnPoint = (index = 0) => v((index % 2 ? 1 : -1) * (3 + index), 1.7, 10);
+export function createRoom(code, mapId) {
+  return {
+    code, mapId, phase: "lobby", wave: 0, enemies: new Map(), players: new Map(),
+    countdown: 0, objective: "Assemble your squad", nextEnemyId: 1, nextAttackId: 1,
+    attackEvents: [], endedAt: 0
+  };
+}
+export function addPlayer(room, socket, identity, profile, name) {
+  const player = {
+    socketId: socket.id, identity, name: String(name || "Ranger").slice(0, 18),
+    position: spawnPoint(room.players.size), yaw: 0, pitch: 0, health: PLAYER_MAX_HEALTH,
+    ammo: MAG_SIZE, reserve: 72, reloadingUntil: 0, reloadDuration: 0,
+    reloadType: null, lastShot: 0, deadUntil: 0,
+    protectedUntil: Date.now() + SPAWN_PROTECTION_MS,
+    kills: 0, connected: true, lastMove: Date.now(), moveSpeed: 0,
+    shotSequence: 0, profile
+  };
+  room.players.set(socket.id, player);
+  return player;
+}
+export function publicState(room, now = Date.now()) {
+  return {
+    code: room.code, mapId: room.mapId, phase: room.phase, wave: room.wave, serverNow: now,
+    countdown: room.phase === "between"
+      ? Math.max(0, Math.ceil((room.countdown - now) / 1000))
+      : 0,
+    objective: room.objective,
+    players: [...room.players.values()].map(({
+      identity, reloadingUntil, reloadDuration, reloadType,
+      lastMove, moveSpeed, profile, shotSequence, ...player
+    }) => ({
+      ...player,
+      level: profile.level,
+      reloading: reloadingUntil > now,
+      reloadEndsAt: reloadingUntil > now ? reloadingUntil : 0,
+      reloadDuration: reloadingUntil > now ? reloadDuration : 0,
+      reloadType: reloadingUntil > now ? reloadType : null
+    })),
+    enemies: [...room.enemies.values()].map(({ attackWindup, flankUntil, ...enemy }) => ({
+      ...enemy,
+      threat: attackWindup ? {
+        targetId: attackWindup.targetId,
+        remainingMs: Math.max(0, attackWindup.endsAt - now)
+      } : null
+    })),
+    attacks: room.attackEvents.map((attack) => ({ ...attack }))
+  };
+}
+export function startMatch(room) {
+  if (room.phase !== "lobby" && room.phase !== "ended") return false;
+  room.phase = "playing";
+  room.wave = 1;
+  room.enemies.clear();
+  for (const [index, player] of [...room.players.values()].entries()) {
+    Object.assign(player, {
+      position: spawnPoint(index), health: PLAYER_MAX_HEALTH, ammo: MAG_SIZE, reserve: 72,
+      deadUntil: 0, protectedUntil: Date.now() + SPAWN_PROTECTION_MS,
+      kills: 0, reloadingUntil: 0, reloadDuration: 0, reloadType: null,
+      lastShot: 0, lastMove: Date.now(),
+      moveSpeed: 0, shotSequence: 0
+    });
+  }
+  spawnWave(room);
+  return true;
+}
+function spawnWave(room) {
+  room.phase = "playing";
+  room.objective = `Eliminate wave ${room.wave}`;
+  const stats = enemyStats(room.wave);
+  const count = waveEnemyCount(room.wave, room.players.size);
+  for (let i = 0; i < count; i++) {
+    const side = i % 4;
+    const offset = -28 + ((i * 13) % 56);
+    const position = side === 0 ? v(-36, 1, offset) : side === 1 ? v(36, 1, offset)
+      : side === 2 ? v(offset, 1, -36) : v(offset, 1, 36);
+    const brute = room.wave % 3 === 0 && i === 0;
+    const health = brute ? Math.round(stats.health * 1.65) : stats.health;
+    room.enemies.set(String(room.nextEnemyId), {
+      id: String(room.nextEnemyId++), position, health, maxHealth: health,
+      speed: brute ? stats.speed * .82 : stats.speed,
+      damage: brute ? Math.round(stats.damage * 1.35) : stats.damage,
+      lastAttack: 0, attackWindup: null, flankUntil: 0,
+      type: brute ? "brute" : "drone"
+    });
+  }
+}
+export function updatePlayer(room, socketId, data, now = Date.now()) {
+  const player = room.players.get(socketId);
+  if (!player || player.deadUntil || !validPosition(data?.position)) return false;
+  const dt = Math.max(0.016, Math.min(1, (now - player.lastMove) / 1000));
+  const dx = data.position.x - player.position.x;
+  const dz = data.position.z - player.position.z;
+  const distance = Math.hypot(dx, dz);
+  if (distance > PLAYER_MAX_MOVE_SPEED * dt + 0.75) return false;
+  const nextPosition = { x: data.position.x, y: Math.min(3.4, data.position.y), z: data.position.z };
+  if (!canTraverse(room.mapId, player.position, nextPosition)) return false;
+  player.position = nextPosition;
+  player.moveSpeed = distance / dt;
+  player.yaw = Number.isFinite(data.yaw)
+    ? Math.atan2(Math.sin(data.yaw), Math.cos(data.yaw))
+    : player.yaw;
+  player.pitch = Number.isFinite(data.pitch) ? Math.max(-1.5, Math.min(1.5, data.pitch)) : player.pitch;
+  player.lastMove = now;
+  return true;
+}
+export function reload(room, socketId, now = Date.now()) {
+  const player = room.players.get(socketId);
+  if (!player) return false;
+  finishReload(player, now);
+  if (room.phase !== "playing" || player.deadUntil ||
+    player.reloadingUntil > now || player.ammo >= MAG_SIZE || player.reserve <= 0) return false;
+  player.reloadType = player.ammo === 0 ? "empty" : "tactical";
+  player.reloadDuration = player.reloadType === "empty" ? RELOAD_MS : TACTICAL_RELOAD_MS;
+  player.reloadingUntil = now + player.reloadDuration;
+  return true;
+}
+function finishReload(player, now) {
+  if (player.reloadingUntil && player.reloadingUntil <= now) {
+    const needed = MAG_SIZE - player.ammo;
+    const moved = Math.min(needed, player.reserve);
+    player.ammo += moved;
+    player.reserve -= moved;
+    player.reloadingUntil = 0;
+    player.reloadDuration = 0;
+    player.reloadType = null;
+  }
+}
+export function shoot(room, socketId, shot, now = Date.now()) {
+  const player = room.players.get(socketId);
+  if (!player || room.phase !== "playing" || player.deadUntil) return { ok: false, reason: "Unavailable" };
+  finishReload(player, now);
+  if (player.reloadingUntil > now) return { ok: false, reason: "Reloading" };
+  if (now - player.lastShot < 140) return { ok: false, reason: "Fire rate" };
+  if (player.ammo <= 0) return { ok: false, reason: "Empty" };
+  const direction = shot?.direction;
+  if (!direction || !["x", "y", "z"].every((key) => Number.isFinite(direction[key]))) return { ok: false, reason: "Invalid aim" };
+  const length = Math.hypot(direction.x, direction.y, direction.z);
+  if (length < 0.9 || length > 1.1) return { ok: false, reason: "Invalid aim" };
+  const suppliedDirection = {
+    x: direction.x / length,
+    y: direction.y / length,
+    z: direction.z / length
+  };
+  const expectedDirection = {
+    x: -Math.sin(player.yaw) * Math.cos(player.pitch),
+    y: Math.sin(player.pitch),
+    z: -Math.cos(player.yaw) * Math.cos(player.pitch)
+  };
+  const alignment = suppliedDirection.x * expectedDirection.x +
+    suppliedDirection.y * expectedDirection.y +
+    suppliedDirection.z * expectedDirection.z;
+  if (alignment < Math.cos(Math.PI / 3)) return { ok: false, reason: "Invalid aim" };
+  const continuedBurst = player.lastShot && now - player.lastShot <= 460;
+  player.shotSequence = continuedBurst ? player.shotSequence + 1 : 0;
+  const recentMoveSpeed = now - player.lastMove <= 250 ? player.moveSpeed : 0;
+  const movementSpread = Math.min(0.016, Math.max(0, recentMoveSpeed - 1.2) * 0.0017);
+  const recoilSpread = Math.min(0.006, player.shotSequence * 0.00125);
+  const spread = movementSpread + recoilSpread;
+  const shotDirection = applyDeterministicSpread(suppliedDirection, spread, player.shotSequence);
+  player.ammo--;
+  player.lastShot = now;
+  let closest = null;
+  let coverDistance = Infinity;
+  for (const obstacle of getMapObstacles(room.mapId)) {
+    const distance = rayObstacleHit(player.position, shotDirection, obstacle);
+    if (distance !== null) coverDistance = Math.min(coverDistance, distance);
+  }
+  for (const enemy of room.enemies.values()) {
+    const bodyDistance = raySphereHit(
+      player.position,
+      shotDirection,
+      { ...enemy.position, y: enemy.position.y + 0.2 },
+      enemy.type === "brute" ? 1.6 : 0.9
+    );
+    const headDistance = raySphereHit(
+      player.position,
+      shotDirection,
+      { ...enemy.position, y: enemy.position.y + (enemy.type === "brute" ? 1.1 : 0.9) },
+      enemy.type === "brute" ? 0.4 : 0.28
+    );
+    const hitZone = headDistance !== null ? "head" : bodyDistance !== null ? "body" : null;
+    const distance = hitZone === "head" ? headDistance : bodyDistance;
+    if (distance !== null && distance < coverDistance && (!closest || distance < closest.distance)) {
+      closest = { enemy, distance, hitZone };
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.editor-header {
-    height: 90px;
-    padding: 0 38px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #242424;
-}
-
-.editor-title {
-    background: transparent;
-    border: 0;
-    outline: 0;
-    color: #f5f5f5;
-    font-size: 26px;
-    font-weight: 500;
-    width: 70%;
-}
-
-.editor-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.icon-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 9px;
-    color: #888;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.icon-btn:hover {
-    background: #222;
-    color: #eee;
-}
-
-.icon-btn.active {
-    color: white;
-    background: #282828;
-}
-
-.toolbar {
-    min-height: 55px;
-    border-bottom: 1px solid #242424;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 0 38px;
-    overflow-x: auto;
-}
-
-.toolbar button {
-    min-width: 38px;
-    height: 36px;
-    padding: 0 9px;
-    border-radius: 7px;
-    color: #999;
-    cursor: pointer;
-}
-
-.toolbar button:hover {
-    background: #242424;
-    color: white;
-}
-
-.toolbar-divider {
-    width: 1px;
-    height: 23px;
-    background: #303030;
-    margin: 0 7px;
-}
-
-.editor-body {
-    flex: 1;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-}
-
-.editor-content {
-    width: min(900px, 90%);
-    height: 100%;
-    padding: 45px 0 120px;
-    overflow-y: auto;
-}
-
-.editor-textarea {
-    width: 100%;
-    min-height: 100%;
-    resize: none;
-    background: transparent;
-    border: 0;
-    outline: 0;
-    color: #e9e9e9;
-    font-size: 18px;
-    line-height: 1.75;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Text",
-        Inter,
-        sans-serif;
-}
-
-.editor-textarea::placeholder {
-    color: #555;
-}
-
-/* markdown preview */
-
-.preview {
-    display: none;
-    color: #e9e9e9;
-    font-size: 18px;
-    line-height: 1.75;
-}
-
-.preview h1,
-.preview h2,
-.preview h3 {
-    margin: 28px 0 12px;
-    line-height: 1.2;
-}
-
-.preview h1 {
-    font-size: 34px;
-}
-
-.preview h2 {
-    font-size: 27px;
-}
-
-.preview h3 {
-    font-size: 22px;
-}
-
-.preview p {
-    margin-bottom: 18px;
-}
-
-.preview ul,
-.preview ol {
-    padding-left: 28px;
-    margin-bottom: 18px;
-}
-
-.preview blockquote {
-    border-left: 3px solid #666;
-    padding-left: 18px;
-    color: #aaa;
-    margin: 20px 0;
-}
-
-.preview code {
-    background: #202020;
-    border-radius: 5px;
-    padding: 3px 6px;
-}
-
-.preview pre {
-    background: #191919;
-    border: 1px solid #292929;
-    border-radius: 10px;
-    padding: 18px;
-    overflow-x: auto;
-    margin: 20px 0;
-}
-
-/* status */
-
-.editor-footer {
-    position: absolute;
-    bottom: 15px;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-}
-
-.save-status {
-    color: #666;
-    font-size: 12px;
-}
-
-/* =========================
-   MODAL
-========================= */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.65);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-}
-
-.modal {
-    width: min(440px, 90%);
-    background: #1b1b1b;
-    border: 1px solid #303030;
-    border-radius: 17px;
-    padding: 25px;
-    box-shadow: 0 25px 80px rgba(0,0,0,.5);
-    animation: modalIn .22s ease;
-}
-
-@keyframes modalIn {
-    from {
-        opacity: 0;
-        transform: scale(.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.modal h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
-}
-
-.modal input {
-    width: 100%;
-    height: 50px;
-    background: #111;
-    border: 1px solid #353535;
-    border-radius: 9px;
-    outline: none;
-    padding: 0 14px;
-    color: white;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 9px;
-    margin-top: 20px;
-}
-
-.modal-buttons button {
-    padding: 10px 17px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.cancel-btn {
-    background: #252525;
-}
-
-.confirm-btn {
-    background: #eee;
-    color: #111;
-}
-
-/* =========================
-   CONTEXT MENU
-========================= */
-
-.context-menu {
-    position: fixed;
-    display: none;
-    width: 180px;
-    background: #202020;
-    border: 1px solid #333;
-    border-radius: 10px;
-    padding: 5px;
-    z-index: 200;
-    box-shadow: 0 15px 40px rgba(0,0,0,.5);
-}
-
-.context-menu button {
-    width: 100%;
-    text-align: left;
-    padding: 10px;
-    border-radius: 7px;
-    cursor: pointer;
-    color: #ccc;
-}
-
-.context-menu button:hover {
-    background: #2d2d2d;
-}
-
-/* =========================
-   MOBILE / PORTRAIT
-========================= */
-
-@media (max-width: 800px) {
-
-    .sidebar {
-        width: 100%;
-        min-width: 100%;
-        position: absolute;
-        left: 0;
-        top: 0;
-    }
-
-    .sidebar.collapsed {
-        width: 0;
-        min-width: 0;
-    }
-
-    .main {
-        width: 100%;
-    }
-
-    .editor-content {
-        width: 90%;
-    }
-
-    .editor-header {
-        padding: 0 20px;
-    }
-
-    .toolbar {
-        padding: 0 20px;
-    }
-
-    .editor-title {
-        font-size: 21px;
-    }
-}
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: .01ms !important;
-        transition-duration: .01ms !important;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-    <!-- ================= SIDEBAR ================= -->
-
-    <aside class="sidebar" id="sidebar">
-
-        <div class="sidebar-header">
-
-            <div class="logo">
-                <div class="logo-mark"></div>
-                <div class="logo-text">studynotes</div>
-            </div>
-
-            <button
-                class="collapse-btn"
-                onclick="toggleSidebar()"
-                aria-label="Collapse sidebar">
-
-                <div class="collapse-icon"></div>
-
-            </button>
-
-        </div>
-
-
-        <div class="space-section">
-
-            <div class="space-title-row">
-                <div class="space-title">YOUR SPACE</div>
-
-                <button
-                    class="add-folder"
-                    onclick="openFolderModal()">
-                    +
-                </button>
-            </div>
-
-            <div class="folder-list" id="folderList"></div>
-
-        </div>
-
-
-        <div class="notes-section">
-
-            <div class="notes-title-row">
-
-                <div>
-                    <div class="notes-title" id="notesTitle">
-                        All notes
-                    </div>
-
-                    <div class="notes-count" id="notesCount">
-                        0 notes
-                    </div>
-                </div>
-
-                <button
-                    class="new-note-btn"
-                    onclick="createNote()">
-                    +
-                </button>
-
-            </div>
-
-
-            <div class="search-box">
-
-                <div class="search-icon">⌕</div>
-
-                <input
-                    id="searchInput"
-                    type="search"
-                    placeholder="Search your notes"
-                    oninput="renderNotes()">
-
-            </div>
-
-
-            <div
-                class="note-list"
-                id="noteList">
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- ================= MAIN ================= -->
-
-    <main class="main">
-
-        <button
-            class="reopen-btn"
-            onclick="toggleSidebar()"
-            aria-label="Open sidebar">
-
-            <div class="collapse-icon"></div>
-
-        </button>
-
-
-        <!-- EMPTY STATE -->
-
-        <section
-            class="empty-main"
-            id="emptyMain">
-
-            <div class="orbit">
-
-                <div class="orbit-ring"></div>
-                <div class="orbit-ring two"></div>
-
-                <div class="orbit-dot"></div>
-
-            </div>
-
-            <h1>Start writing</h1>
-
-            <p>Begin with a thought.</p>
-
-            <button
-                class="main-new-note"
-                onclick="createNote()">
-
-                ＋ &nbsp;New note
-
-            </button>
-
-        </section>
-
-
-        <!-- EDITOR -->
-
-        <section
-            class="editor"
-            id="editor">
-
-            <header class="editor-header">
-
-                <input
-                    id="editorTitle"
-                    class="editor-title"
-                    placeholder="Untitled"
-                    oninput="updateTitle()">
-
-                <div class="editor-actions">
-
-                    <button
-                        class="icon-btn"
-                        onclick="togglePin()"
-                        id="pinButton"
-                        title="Pin">
-                        ☆
-                    </button>
-
-                    <button
-                        class="icon-btn"
-                        onclick="togglePreview()"
-                        id="previewButton"
-                        title="Preview">
-                        ◉
-                    </button>
-
-                    <button
-                        class="icon-btn"
-                        onclick="deleteCurrentNote()"
-                        title="Delete">
-                        ♢
-                    </button>
-
-                </div>
-
-            </header>
-
-
-            <div
-                class="toolbar"
-                id="toolbar">
-
-                <button onclick="format('bold')" title="Bold">
-                    <strong>B</strong>
-                </button>
-
-                <button onclick="format('italic')" title="Italic">
-                    <em>I</em>
-                </button>
-
-                <button onclick="format('underline')" title="Underline">
-                    <u>U</u>
-                </button>
-
-                <button onclick="format('strike')" title="Strikethrough">
-                    <s>S</s>
-                </button>
-
-                <div class="toolbar-divider"></div>
-
-                <button onclick="insertText('# ')" title="Heading">
-                    H
-                </button>
-
-                <button onclick="insertText('- ')" title="Bullet list">
-                    •
-                </button>
-
-                <button onclick="insertText('1. ')" title="Numbered list">
-                    1.
-                </button>
-
-                <button onclick="insertText('- [ ] ')" title="Checklist">
-                    ☑
-                </button>
-
-                <button onclick="insertText('> ')" title="Quote">
-                    ❯
-                </button>
-
-                <button onclick="insertText('`code`')" title="Code">
-                    ‹›
-                </button>
-
-                <div class="toolbar-divider"></div>
-
-                <button onclick="insertText('[text](https://example.com)')">
-                    ↗
-                </button>
-
-            </div>
-
-
-            <div class="editor-body">
-
-                <div class="editor-content">
-
-                    <textarea
-                        id="editorTextarea"
-                        class="editor-textarea"
-                        placeholder="Start writing..."
-                        spellcheck="true"
-                        oninput="updateContent()">
-                    </textarea>
-
-                    <div
-                        id="preview"
-                        class="preview">
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="editor-footer">
-
-                <div
-                    class="save-status"
-                    id="saveStatus">
-                    Saved
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</div>
-
-
-<!-- ================= FOLDER MODAL ================= -->
-
-<div
-    class="modal-overlay"
-    id="folderModal">
-
-    <div class="modal">
-
-        <h2>New folder</h2>
-
-        <input
-            id="folderInput"
-            placeholder="Folder name"
-            onkeydown="if(event.key==='Enter') createFolder()">
-
-        <div class="modal-buttons">
-
-            <button
-                class="cancel-btn"
-                onclick="closeFolderModal()">
-                Cancel
-            </button>
-
-            <button
-                class="confirm-btn"
-                onclick="createFolder()">
-                Create
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<script>
-
-/* =====================================================
-   DATA
-===================================================== */
-
-const STORAGE_KEY = "studynotes-data-v1";
-
-let data = loadData();
-
-let currentNoteId = null;
-
-let currentFolderId = "all";
-
-let previewMode = false;
-
-
-/* =====================================================
-   INITIAL DATA
-===================================================== */
-
-function defaultData() {
-
+  }
+  if (!closest) {
     return {
-
-        folders: [
-            {
-                id: "uncategorized",
-                name: "Unnamed"
-            }
-        ],
-
-        notes: []
-
+      ok: true, hit: false, hitZone: null, damage: 0, ammo: player.ammo,
+      direction: shotDirection, spread,
+      impact: Number.isFinite(coverDistance) ? "cover" : "none",
+      distance: Number.isFinite(coverDistance) ? coverDistance : undefined
     };
-
+  }
+  const damage = closest.hitZone === "head" ? HEADSHOT_DAMAGE : BODY_DAMAGE;
+  closest.enemy.health -= damage;
+  let killed = false;
+  if (closest.enemy.health <= 0) {
+    room.enemies.delete(closest.enemy.id);
+    player.kills++;
+    killed = true;
+  }
+  return {
+    ok: true, hit: true, killed, enemyId: closest.enemy.id,
+    hitZone: closest.hitZone, damage, distance: closest.distance,
+    ammo: player.ammo, direction: shotDirection, spread
+  };
 }
-
-
-/* =====================================================
-   STORAGE
-===================================================== */
-
-function loadData() {
-
-    try {
-
-        const saved =
-            localStorage.getItem(STORAGE_KEY);
-
-        if (saved) {
-
-            return JSON.parse(saved);
-
+function applyDeterministicSpread(direction, spread, sequence) {
+  if (spread <= 0) return direction;
+  const pattern = [
+    [.32, .28], [.42, .78], [-.58, .84], [.7, .52],
+    [-.76, .35], [.31, .92], [-.24, .68], [.62, .74]
+  ][sequence % 8];
+  const rightLength = Math.hypot(direction.x, direction.z) || 1;
+  const right = { x: -direction.z / rightLength, y: 0, z: direction.x / rightLength };
+  const up = {
+    x: -direction.y * right.z,
+    y: direction.x * right.z - direction.z * right.x,
+    z: direction.y * right.x
+  };
+  const adjusted = {
+    x: direction.x + right.x * pattern[0] * spread + up.x * pattern[1] * spread,
+    y: direction.y + right.y * pattern[0] * spread + up.y * pattern[1] * spread,
+    z: direction.z + right.z * pattern[0] * spread + up.z * pattern[1] * spread
+  };
+  const length = Math.hypot(adjusted.x, adjusted.y, adjusted.z);
+  return { x: adjusted.x / length, y: adjusted.y / length, z: adjusted.z / length };
+}
+export function tickRoom(room, dt, now = Date.now()) {
+  room.attackEvents = room.attackEvents.filter((attack) => now - attack.at <= 300);
+  if (room.phase !== "playing") {
+    if (room.phase === "between" && now >= room.countdown) {
+      room.wave++;
+      spawnWave(room);
+    }
+    return null;
+  }
+  for (const [playerIndex, player] of [...room.players.values()].entries()) {
+    finishReload(player, now);
+    if (player.deadUntil && now >= player.deadUntil) {
+      player.deadUntil = 0;
+      player.health = PLAYER_MAX_HEALTH;
+      player.ammo = MAG_SIZE;
+      player.position = spawnPoint(playerIndex);
+      player.protectedUntil = now + SPAWN_PROTECTION_MS;
+    }
+  }
+  const living = [...room.players.values()].filter((player) => !player.deadUntil && player.connected);
+  const targetable = living.filter((player) => player.protectedUntil <= now);
+  const enemies = [...room.enemies.values()].sort((a, b) => Number(a.id) - Number(b.id));
+  for (const enemy of enemies) {
+    if (enemy.attackWindup) {
+      const victim = targetable.find((player) => !player.deadUntil &&
+        player.socketId === enemy.attackWindup.targetId);
+      const inRange = victim && Math.hypot(
+        victim.position.x - enemy.position.x, victim.position.z - enemy.position.z
+      ) <= ENEMY_ATTACK_RANGE;
+      const origin = { x: enemy.position.x, y: 1.25, z: enemy.position.z };
+      const targetPosition = victim && { x: victim.position.x, y: 1.25, z: victim.position.z };
+      if (inRange && hasLineOfSight(room.mapId, origin, targetPosition)) {
+        if (now >= enemy.attackWindup.endsAt) {
+          victim.health = Math.max(0, victim.health - enemy.damage);
+          enemy.lastAttack = now;
+          room.attackEvents.push({
+            id: room.nextAttackId++, enemyId: enemy.id, targetId: victim.socketId,
+            origin, target: { ...victim.position }, at: now, damage: enemy.damage
+          });
+          if (victim.health === 0) {
+            victim.deadUntil = now + RESPAWN_MS;
+            victim.reloadingUntil = 0;
+            victim.reloadDuration = 0;
+            victim.reloadType = null;
+          }
+          enemy.attackWindup = null;
         }
-
-    } catch (error) {
-
-        console.error(error);
-
+        continue;
+      }
+      enemy.attackWindup = null;
     }
-
-    return defaultData();
-
-}
-
-
-function saveData() {
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(data)
-    );
-
-    showSaved();
-
-}
-
-
-function showSaved() {
-
-    const status =
-        document.getElementById("saveStatus");
-
-    if (!status) return;
-
-    status.textContent = "Saved";
-
-}
-
-
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
-function toggleSidebar() {
-
-    const sidebar =
-        document.getElementById("sidebar");
-
-    sidebar.classList.toggle("collapsed");
-
-}
-
-
-/* =====================================================
-   FOLDERS
-===================================================== */
-
-function renderFolders() {
-
-    const list =
-        document.getElementById("folderList");
-
-    list.innerHTML = "";
-
-
-    /* ALL NOTES */
-
-    const all =
-        document.createElement("div");
-
-    all.className =
-        "folder-item " +
-        (currentFolderId === "all"
-            ? "active"
-            : "");
-
-    all.innerHTML = `
-
-        <div class="folder-icon"
-             style="border-radius:2px">
-        </div>
-
-        <div class="folder-name">
-            All notes
-        </div>
-
-        <div class="folder-count">
-            ${data.notes.length}
-        </div>
-
-    `;
-
-    all.onclick = () => {
-
-        currentFolderId = "all";
-
-        currentNoteId = null;
-
-        updateUI();
-
-    };
-
-    list.appendChild(all);
-
-
-    /* CUSTOM FOLDERS */
-
-    data.folders.forEach(folder => {
-
-        const count =
-            data.notes.filter(
-                n => n.folderId === folder.id
-            ).length;
-
-
-        const item =
-            document.createElement("div");
-
-        item.className =
-            "folder-item " +
-            (currentFolderId === folder.id
-                ? "active"
-                : "");
-
-
-        item.innerHTML = `
-
-            <div class="folder-icon"></div>
-
-            <div class="folder-name">
-                ${escapeHTML(folder.name)}
-            </div>
-
-            <div class="folder-count">
-                ${count}
-            </div>
-
-            <div class="folder-edit">
-                ⋯
-            </div>
-
-        `;
-
-
-        item.onclick = () => {
-
-            currentFolderId = folder.id;
-
-            currentNoteId = null;
-
-            updateUI();
-
-        };
-
-
-        list.appendChild(item);
-
-    });
-
-}
-
-
-function openFolderModal() {
-
-    document.getElementById(
-        "folderModal"
-    ).style.display = "flex";
-
-    setTimeout(() => {
-
-        document.getElementById(
-            "folderInput"
-        ).focus();
-
-    }, 100);
-
-}
-
-
-function closeFolderModal() {
-
-    document.getElementById(
-        "folderModal"
-    ).style.display = "none";
-
-    document.getElementById(
-        "folderInput"
-    ).value = "";
-
-}
-
-
-function createFolder() {
-
-    const input =
-        document.getElementById(
-            "folderInput"
-        );
-
-    const name =
-        input.value.trim();
-
-    if (!name) return;
-
-
-    data.folders.push({
-
-        id:
-            "folder-" +
-            Date.now(),
-
-        name
-
-    });
-
-
-    saveData();
-
-    closeFolderModal();
-
-    renderFolders();
-
-}
-
-
-/* =====================================================
-   NOTES
-===================================================== */
-
-function createNote() {
-
-    let folderId =
-        currentFolderId === "all"
-            ? "uncategorized"
-            : currentFolderId;
-
-
-    const note = {
-
-        id:
-            "note-" +
-            Date.now(),
-
-        title: "Untitled",
-
-        content: "",
-
-        folderId,
-
-        pinned: false,
-
-        createdAt: Date.now(),
-
-        updatedAt: Date.now()
-
-    };
-
-
-    data.notes.unshift(note);
-
-    currentNoteId = note.id;
-
-    saveData();
-
-    updateUI();
-
-    setTimeout(() => {
-
-        document
-            .getElementById("editorTitle")
-            .focus();
-
-    }, 100);
-
-}
-
-
-function getCurrentNote() {
-
-    return data.notes.find(
-        n => n.id === currentNoteId
-    );
-
-}
-
-
-function updateTitle() {
-
-    const note =
-        getCurrentNote();
-
-    if (!note) return;
-
-    note.title =
-        document
-            .getElementById("editorTitle")
-            .value ||
-        "Untitled";
-
-    note.updatedAt =
-        Date.now();
-
-    saveData();
-
-    renderNotes();
-
-}
-
-
-function updateContent() {
-
-    const note =
-        getCurrentNote();
-
-    if (!note) return;
-
-    note.content =
-        document
-            .getElementById("editorTextarea")
-            .value;
-
-    note.updatedAt =
-        Date.now();
-
-    document
-        .getElementById("saveStatus")
-        .textContent = "Saving…";
-
-    clearTimeout(window.saveTimer);
-
-    window.saveTimer =
-        setTimeout(() => {
-
-            saveData();
-
-        }, 500);
-
-}
-
-
-function selectNote(id) {
-
-    currentNoteId = id;
-
-    openEditor();
-
-    renderNotes();
-
-}
-
-
-function deleteCurrentNote() {
-
-    if (!currentNoteId) return;
-
-    const note =
-        getCurrentNote();
-
-    if (!note) return;
-
-
-    const ok =
-        confirm(
-            `Delete "${note.title}"?`
-        );
-
-    if (!ok) return;
-
-
-    data.notes =
-        data.notes.filter(
-            n => n.id !== currentNoteId
-        );
-
-
-    currentNoteId = null;
-
-    saveData();
-
-    updateUI();
-
-}
-
-
-function togglePin() {
-
-    const note =
-        getCurrentNote();
-
-    if (!note) return;
-
-    note.pinned =
-        !note.pinned;
-
-    saveData();
-
-    updateEditor();
-
-    renderNotes();
-
-}
-
-
-/* =====================================================
-   NOTE FILTERING
-===================================================== */
-
-function getVisibleNotes() {
-
-    const search =
-        document
-            .getElementById("searchInput")
-            .value
-            .trim()
-            .toLowerCase();
-
-
-    let notes =
-        data.notes.filter(note => {
-
-            const folderMatch =
-                currentFolderId === "all" ||
-                note.folderId === currentFolderId;
-
-            const searchMatch =
-                !search ||
-                note.title
-                    .toLowerCase()
-                    .includes(search) ||
-                note.content
-                    .toLowerCase()
-                    .includes(search);
-
-            return folderMatch &&
-                   searchMatch;
-
-        });
-
-
-    notes.sort((a,b) => {
-
-        if (a.pinned !== b.pinned) {
-
-            return a.pinned ? -1 : 1;
-
-        }
-
-        return b.updatedAt -
-               a.updatedAt;
-
-    });
-
-
-    return notes;
-
-}
-
-
-/* =====================================================
-   RENDER NOTES
-===================================================== */
-
-function renderNotes() {
-
-    const list =
-        document.getElementById(
-            "noteList"
-        );
-
-    list.innerHTML = "";
-
-
-    const notes =
-        getVisibleNotes();
-
-
-    const count =
-        document.getElementById(
-            "notesCount"
-        );
-
-
-    count.textContent =
-        `${notes.length} ${
-            notes.length === 1
-                ? "note"
-                : "notes"
-        }`;
-
-
-    if (notes.length === 0) {
-
-        const empty =
-            document.createElement("div");
-
-        empty.className =
-            "empty-notes";
-
-        empty.innerHTML = `
-
-            <div class="empty-icon">
-                ▤
-            </div>
-
-            <div class="empty-title">
-                No notes yet
-            </div>
-
-            <div class="empty-subtitle">
-                Create your first note.
-            </div>
-
-            <div
-                class="write-link"
-                onclick="createNote()">
-
-                Write a note →
-
-            </div>
-
-        `;
-
-        list.appendChild(empty);
-
-        return;
-
+    let target = null;
+    let distance = Infinity;
+    for (const player of targetable) {
+      if (player.deadUntil || player.protectedUntil > now) continue;
+      const d = Math.hypot(player.position.x - enemy.position.x, player.position.z - enemy.position.z);
+      if (d < distance) { target = player; distance = d; }
     }
-
-
-    notes.forEach(note => {
-
-        const item =
-            document.createElement("div");
-
-        item.className =
-            "note-item " +
-            (currentNoteId === note.id
-                ? "active"
-                : "");
-
-
-        const preview =
-            note.content
-                .replace(/\n/g, " ")
-                .slice(0, 100);
-
-
-        item.innerHTML = `
-
-            <div class="note-item-title">
-
-                ${note.pinned ? "☆ " : ""}
-
-                ${escapeHTML(
-                    note.title || "Untitled"
-                )}
-
-            </div>
-
-            <div class="note-item-preview">
-
-                ${escapeHTML(
-                    preview ||
-                    "No content"
-                )}
-
-            </div>
-
-            <div class="note-item-time">
-
-                ${formatDate(note.updatedAt)}
-
-            </div>
-
-        `;
-
-
-        item.onclick = () => {
-
-            selectNote(note.id);
-
-        };
-
-
-        item.oncontextmenu =
-            event => {
-
-                event.preventDefault();
-
-                showContextMenu(
-                    event,
-                    note.id
-                );
-
-            };
-
-
-        list.appendChild(item);
-
-    });
-
-}
-
-
-/* =====================================================
-   EDITOR
-===================================================== */
-
-function openEditor() {
-
-    document
-        .getElementById("emptyMain")
-        .style.display = "none";
-
-    document
-        .getElementById("editor")
-        .style.display = "flex";
-
-    updateEditor();
-
-}
-
-
-function updateEditor() {
-
-    const note =
-        getCurrentNote();
-
-    if (!note) {
-
-        closeEditor();
-
-        return;
-
-    }
-
-
-    document
-        .getElementById("editorTitle")
-        .value =
-        note.title || "Untitled";
-
-
-    document
-        .getElementById("editorTextarea")
-        .value =
-        note.content || "";
-
-
-    const pin =
-        document.getElementById(
-            "pinButton"
-        );
-
-    pin.textContent =
-        note.pinned
-            ? "★"
-            : "☆";
-
-
-    if (previewMode) {
-
-        updatePreview();
-
-    }
-
-}
-
-
-function closeEditor() {
-
-    document
-        .getElementById("editor")
-        .style.display = "none";
-
-    document
-        .getElementById("emptyMain")
-        .style.display = "flex";
-
-}
-
-
-function togglePreview() {
-
-    previewMode =
-        !previewMode;
-
-
-    const textarea =
-        document.getElementById(
-            "editorTextarea"
-        );
-
-    const preview =
-        document.getElementById(
-            "preview"
-        );
-
-    const toolbar =
-        document.getElementById(
-            "toolbar"
-        );
-
-
-    if (previewMode) {
-
-        textarea.style.display =
-            "none";
-
-        toolbar.style.display =
-            "none";
-
-        preview.style.display =
-            "block";
-
-        updatePreview();
-
-    } else {
-
-        textarea.style.display =
-            "block";
-
-        toolbar.style.display =
-            "flex";
-
-        preview.style.display =
-            "none";
-
-    }
-
-
-    document
-        .getElementById(
-            "previewButton"
-        )
-        .classList.toggle(
-            "active",
-            previewMode
-        );
-
-}
-
-
-function updatePreview() {
-
-    const content =
-        document
-            .getElementById(
-                "editorTextarea"
-            )
-            .value;
-
-    document
-        .getElementById("preview")
-        .innerHTML =
-        markdownToHTML(content);
-
-}
-
-
-/* =====================================================
-   MARKDOWN
-===================================================== */
-
-function markdownToHTML(text) {
-
-    let html =
-        escapeHTML(text);
-
-
-    /* code blocks */
-
-    html =
-        html.replace(
-            /```([\s\S]*?)```/g,
-            "<pre>$1</pre>"
-        );
-
-
-    /* headings */
-
-    html =
-        html.replace(
-            /^### (.*)$/gm,
-            "<h3>$1</h3>"
-        );
-
-    html =
-        html.replace(
-            /^## (.*)$/gm,
-            "<h2>$1</h2>"
-        );
-
-    html =
-        html.replace(
-            /^# (.*)$/gm,
-            "<h1>$1</h1>"
-        );
-
-
-    /* bold */
-
-    html =
-        html.replace(
-            /\*\*(.*?)\*\*/g,
-            "<strong>$1</strong>"
-        );
-
-
-    /* italic */
-
-    html =
-        html.replace(
-            /\*(.*?)\*/g,
-            "<em>$1</em>"
-        );
-
-
-    /* strikethrough */
-
-    html =
-        html.replace(
-            /~~(.*?)~~/g,
-            "<s>$1</s>"
-        );
-
-
-    /* inline code */
-
-    html =
-        html.replace(
-            /`([^`]+)`/g,
-            "<code>$1</code>"
-        );
-
-
-    /* links */
-
-    html =
-        html.replace(
-            /$begin:math:display$\(\[\^$end:math:display$]+)\]$begin:math:text$\(\[\^\)\]\+\)$end:math:text$/g,
-            '<a href="$2" target="_blank">$1</a>'
-        );
-
-
-    /* line processing */
-
-    const lines =
-        html.split("\n");
-
-    let output = "";
-
-    let inList = false;
-
-
-    lines.forEach(line => {
-
-        if (/^- /.test(line)) {
-
-            if (!inList) {
-
-                output += "<ul>";
-
-                inList = true;
-
-            }
-
-            output +=
-                "<li>" +
-                line.slice(2) +
-                "</li>";
-
-            return;
-
-        }
-
-
-        if (inList) {
-
-            output += "</ul>";
-
-            inList = false;
-
-        }
-
-
-        if (
-            line.trim() === ""
-        ) {
-
-            output += "<br>";
-
-        } else if (
-            !line.startsWith("<h") &&
-            !line.startsWith("<pre")
-        ) {
-
-            output +=
-                "<p>" +
-                line +
-                "</p>";
-
+    if (!target) continue;
+    if (distance > ENEMY_ATTACK_RANGE) {
+      if (enemy.flankUntil > now) {
+        enemy.position = flankTarget(room.mapId, enemy, target.position, enemy.speed * dt);
+      } else {
+        const next = chooseEnemyStep(room.mapId, enemy.position, target.position, enemy.speed * dt);
+        if (Math.hypot(next.x - enemy.position.x, next.z - enemy.position.z) > .01) {
+          enemy.position = next;
         } else {
-
-            output += line;
-
+          enemy.flankUntil = now + 1200;
+          enemy.position = flankTarget(room.mapId, enemy, target.position, enemy.speed * dt);
         }
-
-    });
-
-
-    if (inList) {
-
-        output += "</ul>";
-
-    }
-
-
-    return output;
-
-}
-
-
-/* =====================================================
-   FORMATTING
-===================================================== */
-
-function insertText(text) {
-
-    const textarea =
-        document.getElementById(
-            "editorTextarea"
-        );
-
-    const start =
-        textarea.selectionStart;
-
-    const end =
-        textarea.selectionEnd;
-
-    const before =
-        textarea.value.slice(
-            0,
-            start
-        );
-
-    const selected =
-        textarea.value.slice(
-            start,
-            end
-        );
-
-    const after =
-        textarea.value.slice(
-            end
-        );
-
-
-    textarea.value =
-        before +
-        text.replace(
-            "text",
-            selected || "text"
-        ) +
-        after;
-
-
-    textarea.focus();
-
-
-    const position =
-        start +
-        text.length;
-
-
-    textarea.selectionStart =
-        position;
-
-    textarea.selectionEnd =
-        position;
-
-
-    updateContent();
-
-}
-
-
-function format(type) {
-
-    const textarea =
-        document.getElementById(
-            "editorTextarea"
-        );
-
-
-    const start =
-        textarea.selectionStart;
-
-    const end =
-        textarea.selectionEnd;
-
-
-    const selected =
-        textarea.value.slice(
-            start,
-            end
-        );
-
-
-    if (!selected) return;
-
-
-    let wrapper = "";
-
-
-    if (type === "bold")
-        wrapper = "**";
-
-    if (type === "italic")
-        wrapper = "*";
-
-    if (type === "underline")
-        wrapper = "<u>";
-
-    if (type === "strike")
-        wrapper = "~~";
-
-
-    let result;
-
-
-    if (type === "underline") {
-
-        result =
-            "<u>" +
-            selected +
-            "</u>";
-
+      }
     } else {
-
-        result =
-            wrapper +
-            selected +
-            wrapper;
-
+      const origin = { x: enemy.position.x, y: 1.25, z: enemy.position.z };
+      const targetPosition = { x: target.position.x, y: 1.25, z: target.position.z };
+      if (!hasLineOfSight(room.mapId, origin, targetPosition)) {
+        enemy.position = flankTarget(room.mapId, enemy, target.position, enemy.speed * dt);
+      } else if (now - enemy.lastAttack > 850) {
+        enemy.attackWindup = {
+          targetId: target.socketId,
+          endsAt: now + ENEMY_WINDUP_MS + (enemy.type === "brute" ? 180 : 0)
+        };
+      }
     }
-
-
-    textarea.value =
-        textarea.value.slice(
-            0,
-            start
-        ) +
-        result +
-        textarea.value.slice(
-            end
-        );
-
-
-    textarea.focus();
-
-    updateContent();
-
+  }
+  separateEnemies(room, enemies);
+  if (room.enemies.size === 0) {
+    if (room.wave >= 5) return endMatch(room, true);
+    room.phase = "between";
+    room.countdown = now + 5000;
+    room.objective = `Wave cleared — regroup`;
+  } else if (living.length === 0 && [...room.players.values()].every((player) => player.deadUntil - now > 1000)) {
+    return endMatch(room, false);
+  }
+  return null;
 }
-
-
-/* =====================================================
-   KEYBOARD SHORTCUTS
-===================================================== */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            (event.metaKey ||
-             event.ctrlKey) &&
-            event.key.toLowerCase() === "n"
-        ) {
-
-            event.preventDefault();
-
-            createNote();
-
-        }
-
-
-        if (
-            (event.metaKey ||
-             event.ctrlKey) &&
-            event.key.toLowerCase() === "f"
-        ) {
-
-            event.preventDefault();
-
-            document
-                .getElementById(
-                    "searchInput"
-                )
-                .focus();
-
-        }
-
-
-        if (
-            event.key === "Escape"
-        ) {
-
-            document
-                .getElementById(
-                    "folderModal"
-                )
-                .style.display =
-                "none";
-
-            hideContextMenu();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   CONTEXT MENU
-===================================================== */
-
-let contextNoteId = null;
-
-
-function showContextMenu(
-    event,
-    noteId
-) {
-
-    contextNoteId = noteId;
-
-
-    let menu =
-        document.getElementById(
-            "contextMenu"
-        );
-
-
-    if (!menu) {
-
-        menu =
-            document.createElement(
-                "div"
-            );
-
-        menu.id =
-            "contextMenu";
-
-        menu.className =
-            "context-menu";
-
-        menu.innerHTML = `
-
-            <button onclick="duplicateNote()">
-                Duplicate
-            </button>
-
-            <button onclick="toggleContextPin()">
-                Pin / unpin
-            </button>
-
-            <button onclick="deleteContextNote()">
-                Delete
-            </button>
-
-        `;
-
-        document.body.appendChild(menu);
-
-    }
-
-
-    menu.style.display =
-        "block";
-
-    menu.style.left =
-        event.clientX + "px";
-
-    menu.style.top =
-        event.clientY + "px";
-
-}
-
-
-function hideContextMenu() {
-
-    const menu =
-        document.getElementById(
-            "contextMenu"
-        );
-
-    if (menu)
-        menu.style.display =
-            "none";
-
-}
-
-
-document.addEventListener(
-    "click",
-    hideContextMenu
-);
-
-
-function duplicateNote() {
-
-    const original =
-        data.notes.find(
-            n => n.id === contextNoteId
-        );
-
-    if (!original) return;
-
-
-    const copy = {
-
-        ...original,
-
-        id:
-            "note-" +
-            Date.now(),
-
-        title:
-            original.title +
-            " copy",
-
-        createdAt:
-            Date.now(),
-
-        updatedAt:
-            Date.now()
-
+function flankTarget(mapId, enemy, target, step) {
+  const dx = target.x - enemy.position.x;
+  const dz = target.z - enemy.position.z;
+  const distance = Math.hypot(dx, dz);
+  if (distance < 1e-6) return enemy.position;
+  const side = Number(enemy.id) % 2 ? 1 : -1;
+  for (const direction of [side, -side]) {
+    const candidate = {
+      ...enemy.position,
+      x: enemy.position.x - direction * dz / distance * step,
+      z: enemy.position.z + direction * dx / distance * step
     };
-
-
-    data.notes.unshift(copy);
-
-    saveData();
-
-    renderNotes();
-
+    if (canTraverse(mapId, enemy.position, candidate, ENEMY_RADIUS)) return candidate;
+  }
+  return enemy.position;
 }
-
-
-function toggleContextPin() {
-
-    const note =
-        data.notes.find(
-            n => n.id === contextNoteId
-        );
-
-    if (!note) return;
-
-
-    note.pinned =
-        !note.pinned;
-
-
-    saveData();
-
-    renderNotes();
-
-}
-
-
-function deleteContextNote() {
-
-    data.notes =
-        data.notes.filter(
-            n => n.id !== contextNoteId
-        );
-
-
-    if (
-        currentNoteId ===
-        contextNoteId
-    ) {
-
-        currentNoteId = null;
-
+export function separateEnemies(room, enemies = [...room.enemies.values()]) {
+  const minimum = ENEMY_RADIUS * 2;
+  const maxCorrection = 0.14;
+  for (let i = 0; i < enemies.length; i++) {
+    for (let j = i + 1; j < enemies.length; j++) {
+      const a = enemies[i], b = enemies[j];
+      let dx = b.position.x - a.position.x;
+      let dz = b.position.z - a.position.z;
+      let distance = Math.hypot(dx, dz);
+      if (distance >= minimum) continue;
+      if (distance < 1e-6) {
+        const angle = ((Number(a.id) * 97 + Number(b.id) * 53) % 360) * Math.PI / 180;
+        dx = Math.cos(angle); dz = Math.sin(angle); distance = 1;
+      }
+      const correction = Math.min(maxCorrection, (minimum - distance) * 0.5);
+      const nx = dx / distance, nz = dz / distance;
+      const candidates = [
+        [a, { ...a.position, x: a.position.x - nx * correction, z: a.position.z - nz * correction }],
+        [b, { ...b.position, x: b.position.x + nx * correction, z: b.position.z + nz * correction }]
+      ];
+      for (const [enemy, candidate] of candidates) {
+        if (canOccupyPosition(room.mapId, candidate, ENEMY_RADIUS) &&
+            canTraverse(room.mapId, enemy.position, candidate, ENEMY_RADIUS)) {
+          enemy.position = candidate;
+        }
+      }
     }
-
-
-    saveData();
-
-    updateUI();
-
+  }
 }
-
-
-/* =====================================================
-   UI
-===================================================== */
-
-function updateUI() {
-
-    renderFolders();
-
-    renderNotes();
-
-
-    if (currentNoteId) {
-
-        openEditor();
-
+function endMatch(room, won) {
+  room.phase = "ended";
+  room.endedAt = Date.now();
+  room.objective = won ? "Sector secured" : "Squad overwhelmed";
+  return {
+    won, wave: room.wave,
+    rewards: [...room.players.values()].map((player) => ({
+      socketId: player.socketId, identity: player.identity, kills: player.kills,
+      xp: xpForMatch(room.wave, player.kills, won)
+    }))
+  };
+}
+export function roomCode() {
+  return crypto.randomBytes(3).toString("hex").toUpperCase();
+}import express from "express";
+import http from "node:http";
+import path from "node:path";
+import crypto from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { Server } from "socket.io";
+import { canAccessMap, MAPS } from "../shared/progression.js";
+import { issueToken, verifyToken } from "./auth.js";
+import { getProfile, rewardPlayer } from "./store.js";
+import {
+  addPlayer, createRoom, publicState, reload, roomCode, shoot, startMatch, tickRoom, updatePlayer
+} from "./game.js";
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: true, credentials: true } });
+const rooms = new Map();
+const port = Number(process.env.PORT) || 3000;
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const clientDist = path.resolve(projectRoot, process.env.CLIENT_DIST || "dist");
+const clientEntry = process.env.CLIENT_ENTRY || "index.html";
+if (path.basename(clientEntry) !== clientEntry || !clientEntry.endsWith(".html")) {
+  throw new Error("CLIENT_ENTRY must be an HTML filename, not a path");
+}
+app.get("/api/health", (_request, response) => response.json({ ok: true, rooms: rooms.size }));
+app.get("/api/maps", (_request, response) => response.json(MAPS));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(clientDist, { index: clientEntry }));
+  app.get("*splat", (_request, response) => response.sendFile(path.join(clientDist, clientEntry)));
+}
+io.use((socket, next) => {
+  const supplied = socket.handshake.auth?.token;
+  let identity = verifyToken(supplied);
+  let token = supplied;
+  if (!identity) {
+    identity = crypto.randomUUID();
+    token = issueToken(identity);
+  }
+  socket.data.identity = identity;
+  socket.data.token = token;
+  next();
+});
+io.on("connection", (socket) => {
+  const profile = getProfile(socket.data.identity);
+  socket.emit("identity", { token: socket.data.token, profile });
+  socket.on("createRoom", ({ mapId, name } = {}, callback = () => {}) => {
+    const freshProfile = getProfile(socket.data.identity);
+    if (!canAccessMap(freshProfile.xp, mapId)) return callback({ ok: false, error: "That map is locked." });
+    let code;
+    do code = roomCode(); while (rooms.has(code));
+    const room = createRoom(code, mapId);
+    rooms.set(code, room);
+    join(socket, room, freshProfile, name);
+    callback({ ok: true, code });
+  });
+  socket.on("joinRoom", ({ code, name } = {}, callback = () => {}) => {
+    const room = rooms.get(String(code || "").toUpperCase());
+    if (!room) return callback({ ok: false, error: "Room not found." });
+    if (room.phase !== "lobby") return callback({ ok: false, error: "Match already in progress." });
+    const freshProfile = getProfile(socket.data.identity);
+    if (!canAccessMap(freshProfile.xp, room.mapId)) {
+      return callback({ ok: false, error: "Your clearance level does not unlock this map." });
+    }
+    join(socket, room, freshProfile, name);
+    callback({ ok: true, code: room.code });
+  });
+  socket.on("startMatch", () => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || [...room.players.keys()][0] !== socket.id) return;
+    if (startMatch(room)) io.to(room.code).emit("matchStarted", publicState(room));
+  });
+  socket.on("move", (data) => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || room.phase !== "playing") return;
+    if (!updatePlayer(room, socket.id, data)) {
+      const player = room.players.get(socket.id);
+      const now = Date.now();
+      if (player && !player.deadUntil && now - (socket.data.lastMovementCorrection || 0) >= 150) {
+        socket.data.lastMovementCorrection = now;
+        socket.emit("movementCorrection", { position: player.position });
+      }
+    }
+  });
+  socket.on("shoot", (data, callback = () => {}) => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room) return;
+    const result = shoot(room, socket.id, data);
+    callback(result);
+    if (result.ok) socket.to(room.code).emit("shotEffect", {
+      playerId: socket.id, origin: room.players.get(socket.id)?.position,
+      direction: result.direction, hit: result.hit, hitZone: result.hitZone,
+      enemyId: result.hit ? result.enemyId : undefined, distance: result.distance
+    });
+  });
+  socket.on("reload", (callback = () => {}) => {
+    const room = rooms.get(socket.data.roomCode);
+    const started = room && reload(room, socket.id);
+    const player = started && room.players.get(socket.id);
+    callback(player
+      ? { ok: true, type: player.reloadType, duration: player.reloadDuration }
+      : { ok: false, reason: "Reload unavailable" });
+  });
+  socket.on("disconnect", () => {
+    const room = rooms.get(socket.data.roomCode);
+    if (!room) return;
+    room.players.delete(socket.id);
+    if (!room.players.size) rooms.delete(room.code);
+  });
+});
+function join(socket, room, profile, name) {
+  if (socket.data.roomCode) socket.leave(socket.data.roomCode);
+  socket.data.roomCode = room.code;
+  socket.join(room.code);
+  addPlayer(room, socket, socket.data.identity, profile, name);
+  socket.emit("joined", { code: room.code, mapId: room.mapId, socketId: socket.id });
+}
+let lastTick = Date.now();
+setInterval(() => {
+  const now = Date.now();
+  const dt = Math.min(0.1, (now - lastTick) / 1000);
+  lastTick = now;
+  for (const room of rooms.values()) {
+    const result = tickRoom(room, dt, now);
+    if (result) {
+      const results = [];
+      for (const reward of result.rewards) {
+        const updatedProfile = rewardPlayer(reward.identity, reward.xp, reward.kills);
+        results.push({ ...reward, profile: updatedProfile });
+        io.to(reward.socketId).emit("profile", updatedProfile);
+      }
+      io.to(room.code).emit("matchEnded", { ...result, rewards: results });
+    }
+    io.to(room.code).emit("state", publicState(room));
+  }
+}, 50).unref();
+server.listen(port, () => console.log(`Last Light server listening on http://localhost:${port}`));import fs from "node:fs";
+import path from "node:path";
+import { addXp, levelForXp, unlockedMaps } from "../shared/progression.js";
+import { dataDir } from "./data.js";
+const DATA_FILE = path.join(dataDir, "players.json");
+let records = {};
+try {
+  records = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
+function persist() {
+  fs.mkdirSync(dataDir, { recursive: true });
+  const temporary = `${DATA_FILE}.next`;
+  fs.writeFileSync(temporary, JSON.stringify(records, null, 2));
+  fs.renameSync(temporary, DATA_FILE);
+}
+export function getProfile(id) {
+  if (!records[id]) {
+    records[id] = { id, xp: 0, matches: 0, totalKills: 0 };
+    persist();
+  }
+  const record = records[id];
+  return { ...record, level: levelForXp(record.xp), unlockedMaps: unlockedMaps(record.xp) };
+}
+export function rewardPlayer(id, xp, kills) {
+  const profile = addXp(getProfile(id), xp);
+  records[id] = {
+    id,
+    xp: profile.xp,
+    matches: (records[id]?.matches || 0) + 1,
+    totalKills: (records[id]?.totalKills || 0) + Math.max(0, kills || 0)
+  };
+  persist();
+  return getProfile(id);
+}export const PLAYER_MAX_HEALTH = 100;
+export const MAG_SIZE = 12;
+export const RESPAWN_MS = 4000;
+export const ARENA_LIMIT = 42;
+export const PLAYER_RADIUS = 0.46;
+export const PLAYER_HEIGHT = 1.7;
+export const PLAYER_WALK_SPEED = 8;
+export const PLAYER_SPRINT_SPEED = 11.8;
+export const PLAYER_MAX_MOVE_SPEED = 13.5;
+export const ENEMY_RADIUS = 0.56;
+export const ENEMY_ATTACK_RANGE = 1.85;
+export const ENEMY_WINDUP_MS = 420;
+export const SPAWN_PROTECTION_MS = 1800;
+export const RELOAD_MS = 2100;
+export const TACTICAL_RELOAD_MS = 1650;
+export const BODY_DAMAGE = 20;
+export const HEADSHOT_DAMAGE = 40;
+const MAP_SEEDS = { foundry: 7319, tundra: 1847, void: 9923 };
+function randomForMap(mapId) {
+  let seed = MAP_SEEDS[mapId] || MAP_SEEDS.foundry;
+  return () => {
+    seed = Math.imul(seed ^ seed >>> 15, seed | 1);
+    seed ^= seed + Math.imul(seed ^ seed >>> 7, seed | 61);
+    return ((seed ^ seed >>> 14) >>> 0) / 4294967296;
+  };
+}
+/**
+ * Deterministic cover descriptors consumed by both Cannon/Three and the server.
+ * Keeping these as primitive boxes makes collision cheap and identical everywhere.
+ */
+export function getMapObstacles(mapId = "foundry") {
+  const random = randomForMap(mapId);
+  const obstacles = [];
+  const count = mapId === "void" ? 22 : 26;
+  for (let i = 0; i < count; i++) {
+    const ring = i % 2 ? 29 : 18;
+    const angle = (i / count) * Math.PI * 2 + (random() - 0.5) * 0.18;
+    const width = 2.2 + random() * (mapId === "foundry" ? 3.2 : 2.2);
+    const depth = 1.8 + random() * 2.2;
+    obstacles.push({
+      id: `${mapId}-${i}`,
+      x: Math.cos(angle) * ring,
+      z: Math.sin(angle) * ring,
+      width,
+      depth,
+      height: 1.8 + random() * (mapId === "void" ? 5.2 : 2.8),
+      rotation: angle + (random() - 0.5) * 1.2
+    });
+  }
+  // Deliberately arranged central cover gives every spawn a protected route.
+  obstacles.push(
+    { id: `${mapId}-center-a`, x: -6, z: 0, width: 7, depth: 2.2, height: 2.4, rotation: 0.22 },
+    { id: `${mapId}-center-b`, x: 6, z: 0, width: 7, depth: 2.2, height: 2.4, rotation: -0.22 },
+    { id: `${mapId}-center-c`, x: 0, z: -9, width: 2.4, depth: 6, height: 3.1, rotation: 0 }
+  );
+  return obstacles;
+}
+export function positionHitsObstacle(position, obstacle, radius = PLAYER_RADIUS) {
+  const cos = Math.cos(-obstacle.rotation);
+  const sin = Math.sin(-obstacle.rotation);
+  const dx = position.x - obstacle.x;
+  const dz = position.z - obstacle.z;
+  const localX = dx * cos - dz * sin;
+  const localZ = dx * sin + dz * cos;
+  const closestX = Math.max(-obstacle.width / 2, Math.min(obstacle.width / 2, localX));
+  const closestZ = Math.max(-obstacle.depth / 2, Math.min(obstacle.depth / 2, localZ));
+  return (localX - closestX) ** 2 + (localZ - closestZ) ** 2 < radius ** 2;
+}
+export function canOccupyPosition(mapId, position, radius = PLAYER_RADIUS) {
+  if (!validPosition(position, radius)) return false;
+  return !getMapObstacles(mapId).some((obstacle) => positionHitsObstacle(position, obstacle, radius));
+}
+export function canTraverse(mapId, from, to, radius = PLAYER_RADIUS) {
+  const distance = Math.hypot(to.x - from.x, to.z - from.z);
+  const steps = Math.max(1, Math.ceil(distance / Math.max(0.2, radius * 0.5)));
+  for (let step = 1; step <= steps; step++) {
+    const t = step / steps;
+    if (!canOccupyPosition(mapId, {
+      x: from.x + (to.x - from.x) * t,
+      y: to.y,
+      z: from.z + (to.z - from.z) * t
+    }, radius)) return false;
+  }
+  return true;
+}
+export function hasLineOfSight(mapId, from, to) {
+  const delta = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z };
+  const distance = Math.hypot(delta.x, delta.y, delta.z);
+  if (distance < 1e-6) return true;
+  const direction = { x: delta.x / distance, y: delta.y / distance, z: delta.z / distance };
+  return !getMapObstacles(mapId).some((obstacle) => {
+    const hit = rayObstacleHit(from, direction, obstacle, distance);
+    return hit !== null && hit < distance - 0.05;
+  });
+}
+export function chooseEnemyStep(mapId, from, target, maxStep, radius = ENEMY_RADIUS) {
+  const dx = target.x - from.x;
+  const dz = target.z - from.z;
+  const distance = Math.hypot(dx, dz);
+  if (distance < 1e-6 || maxStep <= 0) return { ...from };
+  const step = Math.min(maxStep, distance);
+  const nx = dx / distance;
+  const nz = dz / distance;
+  const directions = [
+    [nx, nz],
+    [nx, 0],
+    [0, nz],
+    [nx * Math.SQRT1_2 - nz * Math.SQRT1_2, nx * Math.SQRT1_2 + nz * Math.SQRT1_2],
+    [nx * Math.SQRT1_2 + nz * Math.SQRT1_2, -nx * Math.SQRT1_2 + nz * Math.SQRT1_2],
+    [-nz, nx],
+    [nz, -nx]
+  ];
+  let best = null;
+  for (const [candidateX, candidateZ] of directions) {
+    const length = Math.hypot(candidateX, candidateZ);
+    if (length < 1e-6) continue;
+    const directionX = candidateX / length;
+    const directionZ = candidateZ / length;
+    const progress = directionX * nx + directionZ * nz;
+    if (progress <= 0.01) continue;
+    const candidate = {
+      x: from.x + directionX * step,
+      y: from.y,
+      z: from.z + directionZ * step
+    };
+    if (!canTraverse(mapId, from, candidate, radius)) continue;
+    const remaining = Math.hypot(target.x - candidate.x, target.z - candidate.z);
+    const score = distance - remaining;
+    if (!best || score > best.score + 1e-8) best = { position: candidate, score };
+  }
+  return best?.position || { ...from };
+}
+export function rayObstacleHit(origin, direction, obstacle, maxDistance = 100) {
+  const cos = Math.cos(-obstacle.rotation);
+  const sin = Math.sin(-obstacle.rotation);
+  const dx = origin.x - obstacle.x;
+  const dz = origin.z - obstacle.z;
+  const localOrigin = {
+    x: dx * cos - dz * sin,
+    y: origin.y - obstacle.height / 2,
+    z: dx * sin + dz * cos
+  };
+  const localDirection = {
+    x: direction.x * cos - direction.z * sin,
+    y: direction.y,
+    z: direction.x * sin + direction.z * cos
+  };
+  const half = { x: obstacle.width / 2, y: obstacle.height / 2, z: obstacle.depth / 2 };
+  let near = 0;
+  let far = maxDistance;
+  for (const axis of ["x", "y", "z"]) {
+    if (Math.abs(localDirection[axis]) < 1e-8) {
+      if (Math.abs(localOrigin[axis]) > half[axis]) return null;
+      continue;
+    }
+    let t1 = (-half[axis] - localOrigin[axis]) / localDirection[axis];
+    let t2 = (half[axis] - localOrigin[axis]) / localDirection[axis];
+    if (t1 > t2) [t1, t2] = [t2, t1];
+    near = Math.max(near, t1);
+    far = Math.min(far, t2);
+    if (near > far) return null;
+  }
+  return near <= maxDistance ? near : null;
+}
+export function waveEnemyCount(wave, playerCount) {
+  return 3 + Math.max(1, playerCount) * 2 + Math.max(0, wave - 1) * 2;
+}
+export function enemyStats(wave) {
+  return {
+    health: 45 + wave * 12,
+    speed: Math.min(5.2, 2 + wave * 0.16),
+    damage: Math.min(28, 8 + wave * 1.2)
+  };
+}
+export function raySphereHit(origin, direction, center, radius = 1) {
+  const ox = center.x - origin.x;
+  const oy = center.y - origin.y;
+  const oz = center.z - origin.z;
+  const projection = ox * direction.x + oy * direction.y + oz * direction.z;
+  if (projection < 0 || projection > 100) return null;
+  const distanceSq = ox * ox + oy * oy + oz * oz - projection * projection;
+  if (distanceSq > radius * radius) return null;
+  return projection - Math.sqrt(Math.max(0, radius * radius - distanceSq));
+}
+export function validPosition(position, radius = 0) {
+  if (!position || !["x", "y", "z"].every((key) => Number.isFinite(position[key]))) return false;
+  return Math.abs(position.x) <= ARENA_LIMIT - radius && Math.abs(position.z) <= ARENA_LIMIT - radius &&
+    position.y >= 0 && position.y <= 10;
+}
+export function xpForMatch(wave, kills, won) {
+  return Math.max(0, wave * 45 + kills * 12 + (won ? 100 : 0));
+}export const MAPS = [
+  { id: "foundry", name: "Ash Foundry", level: 1, accent: "#ff8a3d" },
+  { id: "tundra", name: "Frozen Relay", level: 3, accent: "#63d8ff" },
+  { id: "void", name: "Void Garden", level: 5, accent: "#c07cff" }
+];
+export const XP_PER_LEVEL = 500;
+export function levelForXp(xp) {
+  return Math.max(1, Math.floor(Math.max(0, Number(xp) || 0) / XP_PER_LEVEL) + 1);
+}
+export function unlockedMaps(xp) {
+  const level = levelForXp(xp);
+  return MAPS.filter((map) => level >= map.level).map((map) => map.id);
+}
+export function xpProgress(xp) {
+  const numericXp = Number(xp);
+  const safeXp = Number.isFinite(numericXp) ? Math.max(0, Math.floor(numericXp)) : 0;
+  const current = safeXp % XP_PER_LEVEL;
+  return {
+    current,
+    required: XP_PER_LEVEL,
+    remaining: XP_PER_LEVEL - current,
+    percent: current / XP_PER_LEVEL * 100
+  };
+}
+export function newlyUnlockedMaps(previousXp, nextXp) {
+  const previous = new Set(unlockedMaps(previousXp));
+  return unlockedMaps(nextXp).filter((mapId) => !previous.has(mapId));
+}
+export function canAccessMap(xp, mapId) {
+  return unlockedMaps(xp).includes(mapId);
+}
+export function addXp(profile, amount) {
+  const xp = Math.max(0, (profile.xp || 0) + Math.max(0, Math.floor(amount || 0)));
+  return { ...profile, xp, level: levelForXp(xp), unlockedMaps: unlockedMaps(xp) };
+}export const WEAPONS = Object.freeze({
+  rifle: Object.freeze({
+    id: "rifle", name: "AR-17 Rifle", category: "Balanced assault", cost: 0,
+    description: "Reliable all-rounder · controlled bursts",
+    magSize: 12, reserve: 72, fireInterval: 140, bodyDamage: 20, headDamage: 40,
+    reloadMs: 2100, tacticalReloadMs: 1650, spreadMultiplier: 1, recoil: 0.38
+  }),
+  smg: Object.freeze({
+    id: "smg", name: "Viper SMG", category: "Close quarters", cost: 120,
+    description: "Fast handling · larger magazine · lower damage",
+    magSize: 24, reserve: 120, fireInterval: 95, bodyDamage: 12, headDamage: 24,
+    reloadMs: 1800, tacticalReloadMs: 1400, spreadMultiplier: 1.35, recoil: 0.27
+  }),
+  marksman: Object.freeze({
+    id: "marksman", name: "Longwatch DMR", category: "Precision rifle", cost: 280,
+    description: "Slow firing · high damage · precise shots",
+    magSize: 8, reserve: 48, fireInterval: 430, bodyDamage: 38, headDamage: 76,
+    reloadMs: 2350, tacticalReloadMs: 1900, spreadMultiplier: 0.65, recoil: 0.65
+  })
+});
+export const DEFAULT_WEAPON_ID = "rifle";
+export function weaponFor(id) {
+  return Object.hasOwn(WEAPONS, id) ? WEAPONS[id] : WEAPONS[DEFAULT_WEAPON_ID];
+}
+export function tokensForMatch(wave, kills, won) {
+  return Math.max(0, Math.floor(wave) * 18 + Math.max(0, Math.floor(kills)) * 6 + (won ? 45 : 0));
+}export function enemyFacingYaw(dx, dz, animated) {
+  return Math.atan2(dx, dz) + (animated ? Math.PI : 0);
+}export function isGameplayTypingTarget(target) {
+  if (!target || typeof target.matches !== "function") return false;
+  const acceptsText = target.matches("input, textarea, select") || target.isContentEditable;
+  return Boolean(acceptsText && !target.closest?.(".hidden"));
+}    hip.position.set(side * .2, -.08, 0);
+    body.add(hip);
+    part(hip, geometry.joint, jointMaterial, [0, 0, 0], [.13, .13, .13]);
+    part(hip, geometry.limb, bodyMaterial, [0, -.32, 0], [.13, .27, .14]);
+    part(hip, geometry.rounded, armorMaterial, [0, -.28, .11], [.25, .36, .12]);
+    const knee = new THREE.Group();
+    knee.position.set(0, -.64, 0);
+    hip.add(knee);
+    part(knee, geometry.joint, armorMaterial, [0, 0, .08], [.14, .13, .11]);
+    part(knee, geometry.limb, bodyMaterial, [0, -.3, 0], [.115, .26, .12]);
+    part(knee, geometry.rounded, armorMaterial, [0, -.25, .1], [.2, .35, .1]);
+    const foot = part(knee, geometry.foot, jointMaterial, [0, -.59, .12], [.15, .1, .26], [Math.PI / 2, 0, 0]);
+    joints.push({ hip, knee, foot, side, offset: side > 0 ? 0 : Math.PI });
+    const shoulder = new THREE.Group();
+    shoulder.position.set(side * .46, .72, 0);
+    shoulder.rotation.set(-.95, 0, side * -.12);
+    body.add(shoulder);
+    part(shoulder, geometry.joint, armorMaterial, [0, 0, 0], [.17, .18, .17]);
+    part(shoulder, geometry.limb, bodyMaterial, [0, -.25, 0], [.105, .22, .11]);
+    const elbow = new THREE.Group();
+    elbow.position.set(0, -.49, 0);
+    elbow.rotation.x = -.75;
+    shoulder.add(elbow);
+    part(elbow, geometry.joint, jointMaterial, [0, 0, 0], [.1, .1, .1]);
+    part(elbow, geometry.limb, bodyMaterial, [0, -.23, 0], [.095, .2, .1]);
+    part(elbow, geometry.head, jointMaterial, [0, -.45, 0], [.115, .14, .105]);
+    arms.push({ shoulder, elbow, side, baseShoulderX: shoulder.rotation.x, baseElbowX: elbow.rotation.x });
+  }
+  const weapon = new THREE.Group();
+  weapon.position.set(0, .45, .5);
+  weapon.rotation.x = -.04;
+  weapon.userData.baseRotationX = weapon.rotation.x;
+  body.add(weapon);
+  part(weapon, geometry.rounded, jointMaterial, [0, 0, 0], [.18, .15, .62]);
+  part(weapon, geometry.rounded, armorMaterial, [0, .105, -.05], [.1, .1, .22]);
+  part(weapon, geometry.antenna, jointMaterial, [0, 0, .57], [.035, .62, .035], [Math.PI / 2, 0, 0]);
+  part(weapon, geometry.rounded, jointMaterial, [0, -.18, -.12], [.12, .32, .12], [-.18, 0, 0]);
+  part(weapon, geometry.rounded, coreMaterial, [0, .12, .13], [.06, .035, .08]);
+  const enemyFlash = part(weapon, new THREE.ConeGeometry(.09, .34, qualityLow ? 6 : 10),
+    new THREE.MeshBasicMaterial({
+      color: 0xffc179, transparent: true, opacity: .9, blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }), [0, 0, .92], [.8, .8, 1], [Math.PI / 2, 0, 0]);
+  enemyFlash.visible = false;
+  enemyFlash.userData.disposeGeometry = true;
+  joints.forEach((joint) => {
+    joint.baseHipX = joint.hip.rotation.x;
+    joint.baseHipZ = joint.hip.rotation.z;
+    joint.baseKneeZ = joint.knee.rotation.z;
+  });
+  return { mesh, body, bodyMaterial, armorMaterial, coreMaterial, reactiveMaterials, joints, arms, weapon, enemyFlash };
+}
+function loadSoldierAsset() {
+  if (qualityLow || soldierAsset || soldierLoadState === "ready") return;
+  new GLTFLoader().load(
+    "/models/Soldier.glb",
+    (gltf) => {
+      soldierAsset = gltf;
+      soldierLoadState = "ready";
+      const status = $("#assetStatus");
+      if (status) status.textContent = "Animated hostiles ready";
+      for (const item of entities.values()) {
+        if (item.kind === "enemy" && item.modelKind !== "gltf" && !item.dyingUntil) {
+          replaceEnemyWithSoldier(item);
+        }
+      }
+    },
+    (progress) => {
+      const status = $("#assetStatus");
+      if (!status || soldierLoadState !== "loading") return;
+      if (progress.total > 0) {
+        status.textContent = `Loading soldiers · ${Math.min(99, Math.round(progress.loaded / progress.total * 100))}%`;
+      } else {
+        status.textContent = `Loading soldiers · ${Math.max(1, Math.round(progress.loaded / 1024))} KB`;
+      }
+    },
+    (error) => {
+      soldierLoadState = "error";
+      console.error("Last Light could not load /models/Soldier.glb; using procedural fallback.", error);
+      const status = $("#assetStatus");
+      if (status) {
+        status.textContent = "Soldier asset failed · fallback active";
+        status.classList.add("asset-error");
+      }
+    }
+  );
+}
+function createSoldierModel(enemy) {
+  const visual = cloneSkeleton(soldierAsset.scene);
+  const mesh = new THREE.Group();
+  mesh.add(visual);
+  const reactiveMaterials = [];
+  visual.traverse((object) => {
+    if (!object.isMesh) return;
+    object.castShadow = !qualityLow;
+    object.receiveShadow = !qualityLow;
+    const sourceMaterials = Array.isArray(object.material) ? object.material : [object.material];
+    const clonedMaterials = sourceMaterials.map((source) => {
+      const material = source.clone();
+      if (material.map) {
+        material.map.colorSpace = THREE.SRGBColorSpace;
+        material.map.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      }
+      if (material.color) {
+        const variants = {
+          foundry: [0x596354, 0x626052, 0x4d5b56],
+          tundra: [0x77898d, 0x6c8288, 0x889291],
+          void: [0x625d69, 0x6b5b6d, 0x555363]
+        }[selectedMap];
+        const variantIndex = ((Number(enemy.id) || 0) + (enemy.wave || state?.wave || 1)) % variants.length;
+        material.color.lerp(new THREE.Color(variants[variantIndex]), enemy.type === "brute" ? .37 : .27);
+      }
+      if (Number.isFinite(material.roughness)) material.roughness = THREE.MathUtils.clamp(material.roughness, .42, .86);
+      if (Number.isFinite(material.metalness)) material.metalness = THREE.MathUtils.clamp(material.metalness, 0, .34);
+      if (source.name?.includes("Visor")) {
+        material.color.setHex(0x60757b);
+        material.roughness = .25;
+        material.metalness = .48;
+      }
+      if (material.emissive) {
+        material.userData.baseEmissive = material.emissive.clone();
+        material.userData.baseEmissiveIntensity = material.emissiveIntensity || 0;
+        reactiveMaterials.push(material);
+      }
+      return material;
+    });
+    object.material = Array.isArray(object.material) ? clonedMaterials : clonedMaterials[0];
+  });
+  visual.scale.setScalar(enemy.type === "brute" ? 1.15 : 1.01);
+  visual.updateMatrixWorld(true);
+  const bounds = new THREE.Box3().setFromObject(visual);
+  visual.position.y -= bounds.min.y;
+  const equipmentVariants = {
+    foundry: [0x252b29, 0x35302a, 0x283230],
+    tundra: [0x35464b, 0x435257, 0x30444b],
+    void: [0x302d38, 0x3d3542, 0x2b303b]
+  }[selectedMap];
+  const variantIndex = ((Number(enemy.id) || 0) + (enemy.wave || state?.wave || 1)) % equipmentVariants.length;
+  const equipmentMaterial = new THREE.MeshStandardMaterial({
+    color: enemy.type === "brute" ? 0x30343a : equipmentVariants[variantIndex],
+    emissive: 0x17120e, emissiveIntensity: 0,
+    roughness: .62, metalness: .26
+  });
+  equipmentMaterial.userData.baseEmissive = equipmentMaterial.emissive.clone();
+  equipmentMaterial.userData.baseEmissiveIntensity = 0;
+  reactiveMaterials.push(equipmentMaterial);
+  const webbingMaterial = new THREE.MeshStandardMaterial({
+    color: enemy.type === "brute" ? 0x26292b : 0x48483c,
+    roughness: .93, metalness: .02
+  });
+  const badgeMaterial = new THREE.MeshStandardMaterial({
+    color: enemy.type === "brute" ? 0x9e5145 : 0x9b8660,
+    roughness: .71, metalness: .13
+  });
+  const kit = (geometry, material, position, rotation) => {
+    const piece = new THREE.Mesh(geometry, material);
+    piece.position.set(...position);
+    if (rotation) piece.rotation.set(...rotation);
+    piece.userData.disposeGeometry = true;
+    piece.castShadow = true;
+    mesh.add(piece);
+    return piece;
+  };
+  kit(new RoundedBoxGeometry(.49, .61, .18, 2, .035), webbingMaterial,
+    [0, 1.14, -.13]);
+  kit(new RoundedBoxGeometry(.37, .33, .045, 2, .012), equipmentMaterial,
+    [0, 1.24, -.238]);
+  kit(new RoundedBoxGeometry(.27, .07, .012, 2, .003), badgeMaterial,
+    [0, 1.38, -.27]);
+  for (const side of [-1, 1]) {
+    kit(new RoundedBoxGeometry(.1, .18, .085, 2, .012), equipmentMaterial,
+      [side * .15, 1.03, -.27]);
+    kit(new RoundedBoxGeometry(.038, .46, .04, 2, .008), webbingMaterial,
+      [side * .23, 1.31, -.21], [0, 0, side * -.22]);
+    kit(new RoundedBoxGeometry(.1, .07, .14, 2, .009), badgeMaterial,
+      [side * .33, 1.45, -.035]);
+  }
+  const rifle = new THREE.Group();
+  const receiver = new THREE.Mesh(new RoundedBoxGeometry(.13, .13, .37, 3, .013), equipmentMaterial);
+  const handguard = new THREE.Mesh(new THREE.CylinderGeometry(.053, .061, .36, 8), equipmentMaterial);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, .34, 10), equipmentMaterial);
+  const stock = new THREE.Mesh(new RoundedBoxGeometry(.11, .13, .25, 2, .009), webbingMaterial);
+  const magazine = new THREE.Mesh(new RoundedBoxGeometry(.08, .18, .1, 2, .012), webbingMaterial);
+  const sight = new THREE.Mesh(new RoundedBoxGeometry(.07, .065, .09, 2, .008), badgeMaterial);
+  receiver.userData.disposeGeometry = true;
+  handguard.userData.disposeGeometry = true;
+  barrel.userData.disposeGeometry = true;
+  stock.userData.disposeGeometry = true;
+  magazine.userData.disposeGeometry = true;
+  sight.userData.disposeGeometry = true;
+  handguard.rotation.x = Math.PI / 2;
+  handguard.position.z = -.32;
+  barrel.rotation.x = Math.PI / 2;
+  barrel.position.z = -.65;
+  stock.position.z = .28;
+  magazine.position.set(0, -.15, -.08);
+  magazine.rotation.x = -.13;
+  sight.position.set(0, .105, -.12);
+  rifle.add(receiver, handguard, barrel, stock, magazine, sight);
+  rifle.position.set(.22, 1.24, -.36);
+  rifle.rotation.set(.06, -.08, -.12);
+  rifle.userData.baseRotationX = rifle.rotation.x;
+  rifle.traverse((object) => { if (object.isMesh) object.castShadow = true; });
+  mesh.add(rifle);
+  const pack = new THREE.Mesh(
+    new RoundedBoxGeometry(enemy.type === "brute" ? .58 : .43, enemy.type === "brute" ? .72 : .55, .16, 3, .04),
+    webbingMaterial
+  );
+  pack.position.set(0, 1.1, .18);
+  pack.userData.disposeGeometry = true;
+  pack.castShadow = !qualityLow;
+  mesh.add(pack);
+  if (enemy.type === "brute") {
+    for (const side of [-1, 1]) {
+      const pauldron = new THREE.Mesh(
+        new RoundedBoxGeometry(.3, .18, .28, 2, .035),
+        equipmentMaterial.clone()
+      );
+      pauldron.position.set(side * .42, 1.42, -.04);
+      pauldron.userData.disposeGeometry = true;
+      pauldron.rotation.z = side * -.13;
+      pauldron.castShadow = !qualityLow;
+      mesh.add(pauldron);
+    }
+  }
+  const enemyFlash = new THREE.Mesh(
+    new THREE.ConeGeometry(.065, .24, 10),
+    new THREE.MeshBasicMaterial({
+      color: 0xffc179, transparent: true, opacity: .86,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    })
+  );
+  enemyFlash.rotation.x = -Math.PI / 2;
+  enemyFlash.position.set(0, 0, -.87);
+  enemyFlash.visible = false;
+  enemyFlash.userData.disposeGeometry = true;
+  rifle.add(enemyFlash);
+  const mixer = new THREE.AnimationMixer(visual);
+  const findClip = (name) => soldierAsset.animations.find((clip) =>
+    clip.name.toLowerCase().includes(name));
+  const actions = {};
+  for (const name of ["idle", "walk", "run"]) {
+    const clip = findClip(name);
+    if (clip) actions[name] = mixer.clipAction(clip);
+  }
+  const initialAction = actions.idle || actions.walk || actions.run;
+  initialAction?.reset().play();
+  return {
+    mesh, mixer, actions, activeAction: initialAction, activeAnimation: initialAction ? "idle" : "",
+    reactiveMaterials, modelKind: "gltf", modelOffsetY: 0, enemyFlash, weapon: rifle
+  };
+}
+function setEnemyAnimation(item, name) {
+  if (!item.actions) return;
+  const next = item.actions[name] || item.actions.walk || item.actions.idle || item.actions.run;
+  if (!next || next === item.activeAction) return;
+  next.reset().fadeIn(.18).play();
+  item.activeAction?.fadeOut(.18);
+  item.activeAction = next;
+  item.activeAnimation = name;
+}
+function disposeEntityModel(item) {
+  item.mixer?.stopAllAction();
+  if (item.mixer) item.mixer.uncacheRoot(item.mixer.getRoot());
+  const materials = new Set();
+  item.mesh.traverse((object) => {
+    if (!object.isMesh) return;
+    if (object.userData.disposeGeometry) object.geometry?.dispose();
+    if (!object.material) return;
+    const objectMaterials = Array.isArray(object.material) ? object.material : [object.material];
+    objectMaterials.forEach((material) => materials.add(material));
+  });
+  materials.forEach((material) => material.dispose());
+}
+function replaceEnemyWithSoldier(item) {
+  if (!soldierAsset || !scene) return;
+  const oldMesh = item.mesh;
+  oldMesh.remove(item.health);
+  const model = createSoldierModel({
+    type: item.type, id: item.serverId, wave: item.wave
+  });
+  model.mesh.position.copy(oldMesh.position);
+  model.mesh.position.y = 0;
+  model.mesh.rotation.copy(oldMesh.rotation);
+  item.health.position.y = item.type === "brute" ? 2.3 : 2.02;
+  model.mesh.add(item.health);
+  scene.add(model.mesh);
+  scene.remove(oldMesh);
+  disposeEntityModel(item);
+  Object.assign(item, model);
+  item.target.y = 0;
+  item.lastTarget.y = 0;
+  addEnemyContactShadow(item);
+}
+function addEnemyContactShadow(item) {
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(item.type === "brute" ? .68 : .52, qualityLow ? 12 : 28),
+    new THREE.MeshBasicMaterial({
+      color: 0x080a08, transparent: true, opacity: qualityLow ? .15 : .28,
+      depthWrite: false
+    })
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.userData.disposeGeometry = true;
+  shadow.position.y = -(item.modelOffsetY ?? 0) + .018;
+  shadow.scale.set(1, .62, 1);
+  shadow.renderOrder = 1;
+  item.mesh.add(shadow);
+  item.contactShadow = shadow;
+}
+function syncEntities(next) {
+  if (!scene || !next) return;
+  const active = new Set();
+  for (const enemy of next.enemies) {
+    const id = `e${enemy.id}`; active.add(id);
+    let item = entities.get(id);
+    if (!item) {
+      const color = enemy.type === "brute" ? 0xff315f : selectedMap === "tundra" ? 0x2f9dcc : 0xe13b48;
+      const model = soldierAsset && !qualityLow
+        ? createSoldierModel(enemy)
+        : { ...createEnemyModel(enemy, color), modelKind: "fallback", modelOffsetY: enemy.type === "brute" ? 1.42 : 1.25 };
+      const { mesh } = model;
+      const health = new THREE.Group();
+      health.position.y = model.modelKind === "gltf"
+        ? (enemy.type === "brute" ? 2.3 : 2.02)
+        : (enemy.type === "brute" ? 1.9 : 1.55);
+      const back = new THREE.Mesh(new THREE.PlaneGeometry(0.92, 0.075), new THREE.MeshBasicMaterial({
+        color: 0x111411, transparent: true, opacity: .68, depthTest: true
+      }));
+      const fill = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 0.035), new THREE.MeshBasicMaterial({
+        color: enemy.type === "brute" ? 0xa75d53 : 0xb78c65,
+        transparent: true, opacity: .92, depthTest: true
+      }));
+      fill.position.z = 0.005;
+      const indicator = new THREE.Mesh(
+        new THREE.CircleGeometry(.075, 3),
+        new THREE.MeshBasicMaterial({
+          color: enemy.type === "brute" ? 0xd99069 : 0xc7b28d,
+          transparent: true, opacity: .72, depthTest: true
+        })
+      );
+      indicator.position.set(0, .16, .006);
+      back.userData.disposeGeometry = true;
+      fill.userData.disposeGeometry = true;
+      indicator.userData.disposeGeometry = true;
+      indicator.rotation.z = Math.PI;
+      indicator.visible = enemy.type === "brute";
+      health.add(back, fill, indicator);
+      mesh.add(health);
+      scene.add(mesh);
+      item = {
+        ...model, health, fill, indicator, kind: "enemy", type: enemy.type,
+        serverId: enemy.id, wave: next.wave,
+        target: new THREE.Vector3(enemy.position.x, model.modelOffsetY ?? 0, enemy.position.z),
+        lastTarget: new THREE.Vector3(enemy.position.x, model.modelOffsetY ?? 0, enemy.position.z),
+        facing: 0, phase: Number(enemy.id) * 1.73, hitUntil: 0, staggerUntil: 0,
+        attackUntil: 0, windupUntil: 0, windupTargetId: null,
+        flashUntil: 0, healthRatio: 1,
+        motionX: 0, motionZ: 0,
+        baseScale: new THREE.Vector3(1, 1, 1)
+      };
+      addEnemyContactShadow(item);
+      entities.set(id, item);
+    }
+    item.motionX = enemy.position.x - item.target.x;
+    item.motionZ = enemy.position.z - item.target.z;
+    item.target.set(enemy.position.x, item.modelOffsetY ?? 0, enemy.position.z);
+    item.windupUntil = enemy.threat ? performance.now() + enemy.threat.remainingMs : 0;
+    item.windupTargetId = enemy.threat?.targetId ?? null;
+    const healthRatio = Math.max(0, enemy.health / enemy.maxHealth);
+    item.healthRatio = healthRatio;
+    item.fill.scale.x = healthRatio;
+    item.fill.position.x = -(1 - healthRatio) * 0.43;
+    item.fill.material.color.setHex(healthRatio < .3 ? 0x9e514b :
+      enemy.type === "brute" ? 0xa75d53 : 0xb78c65);
+    item.health.visible = healthRatio < 0.999;
+  }
+  for (const teammate of next.players.filter((p) => p.socketId !== myId)) {
+    const id = `p${teammate.socketId}`; active.add(id);
+    let item = entities.get(id);
+    if (!item) {
+      const model = createEnemyModel({ type: "rifleman" }, 0x7faeb0);
+      model.coreMaterial.emissiveIntensity = .18;
+      scene.add(model.mesh);
+      item = { ...model, kind: "player", target: new THREE.Vector3() };
+      entities.set(id, item);
+    }
+    item.target.set(teammate.position.x, teammate.position.y - .8, teammate.position.z);
+    item.mesh.visible = !teammate.deadUntil;
+    if (Number.isFinite(teammate.yaw)) item.mesh.rotation.y = teammate.yaw;
+  }
+  for (const [id, item] of entities) {
+    if (!active.has(id)) {
+      if (item.kind === "enemy") {
+        if (!item.dyingUntil) startEnemyDeath(item, id);
+      } else {
+        scene.remove(item.mesh);
+        disposeEntityModel(item);
+        entities.delete(id);
+      }
+    }
+  }
+  function startEnemyDeath(item, id) {
+    item.dyingUntil = performance.now() + 620;
+    item.deathDirection = Number(String(id).replace(/\D/g, "")) % 2 ? 1 : -1;
+    item.motionX = 0;
+    item.motionZ = 0;
+    item.health.visible = false;
+    item.enemyFlash && (item.enemyFlash.visible = false);
+    setEnemyAnimation(item, "idle");
+    deathBurst(item.mesh.position, item.type === "brute" ? 0x6f5b52 : 0x756b5b);
+  }
+  for (const attack of next.attacks || []) renderEnemyAttack(attack);
+}
+function renderEnemyAttack(attack) {
+  if (seenAttackIds.has(attack.id)) return;
+  seenAttackIds.add(attack.id);
+  if (seenAttackIds.size > 200) {
+    const oldest = seenAttackIds.values().next().value;
+    seenAttackIds.delete(oldest);
+  }
+  const item = entities.get(`e${attack.enemyId}`);
+  if (item) {
+    item.attackUntil = performance.now() + 260;
+    const dx = attack.target.x - attack.origin.x;
+    const dz = attack.target.z - attack.origin.z;
+    if (Math.hypot(dx, dz) > .001) {
+      item.facing = enemyFacingYaw(dx, dz, item.modelKind === "gltf");
+    }
+  }
+  const origin = new THREE.Vector3(attack.origin.x, attack.origin.y, attack.origin.z);
+  const target = new THREE.Vector3(attack.target.x, attack.target.y, attack.target.z);
+  const distance = origin.distanceTo(target);
+  const direction = target.clone().sub(origin).normalize();
+  tracer(origin, direction, 0xbfa783, distance);
+  flashPointLight(origin, 0xffb56b, qualityLow ? .65 : 1.25, 70);
+  if (item?.enemyFlash) {
+    item.enemyFlash.visible = true;
+    item.enemyFlash.rotation.z = (Number(attack.id) * 1.71) % Math.PI;
+    setTimeout(() => { if (item.enemyFlash) item.enemyFlash.visible = false; }, 55);
+  }
+  if (attack.targetId === myId) showDamageDirection(attack.origin);
+}
+function reactEnemyHit(enemyId, hitZone) {
+  const enemy = entities.get(`e${enemyId}`);
+  if (!enemy) return;
+  const now = performance.now();
+  enemy.hitUntil = now + (hitZone === "head" ? 180 : 125);
+  enemy.staggerUntil = now + (hitZone === "head" ? 230 : 155);
+}
+function showDamageDirection(origin) {
+  const bearing = Math.atan2(origin.x - player.position.x, origin.z - player.position.z);
+  const relativeDegrees = THREE.MathUtils.radToDeg(bearing - player.yaw);
+  const indicator = $(".damage-direction");
+  indicator.style.transform = `translate(-50%, -50%) rotate(${relativeDegrees}deg)`;
+  indicator.classList.remove("active");
+  requestAnimationFrame(() => indicator.classList.add("active"));
+  setTimeout(() => indicator.classList.remove("active"), 420);
+}
+function updateIncomingThreat() {
+  const indicator = $(".incoming-direction");
+  const label = $(".incoming-label");
+  const me = state?.players.find((candidate) => candidate.socketId === myId);
+  let closest = null;
+  if (!me?.deadUntil) {
+    for (const item of entities.values()) {
+      if (item.kind !== "enemy" || item.dyingUntil ||
+        item.windupTargetId !== myId || item.windupUntil <= performance.now()) continue;
+      const distance = item.mesh.position.distanceToSquared(camera.position);
+      if (!closest || distance < closest.distance) closest = { item, distance };
+    }
+  }
+  indicator.classList.toggle("active", Boolean(closest));
+  label.classList.toggle("hidden", !closest);
+  if (closest) {
+    const origin = closest.item.mesh.position;
+    const bearing = Math.atan2(origin.x - player.position.x, origin.z - player.position.z);
+    indicator.style.transform =
+      `translate(-50%, -50%) rotate(${THREE.MathUtils.radToDeg(bearing - player.yaw)}deg)`;
+  }
+}
+function fire() {
+  if (!state || state.phase !== "playing") return;
+  const me = state.players.find((item) => item.socketId === myId);
+  if (!me || me.deadUntil || me.reloading) return;
+  if (me.ammo <= 0) {
+    dryFire();
+    return;
+  }
+  const direction = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion).normalize();
+  muzzleLight.intensity = 2.4;
+  muzzleFlash.visible = true;
+  muzzleFlash.rotation.z = Math.random() * Math.PI;
+  recoil = Math.min(1, recoil + currentWeapon.recoil);
+  playSound("shot");
+  ejectShell();
+  const muzzlePosition = muzzleFlash.getWorldPosition(new THREE.Vector3());
+  setTimeout(() => {
+    if (muzzleLight) muzzleLight.intensity = 0;
+    if (muzzleFlash) muzzleFlash.visible = false;
+  }, 42);
+  tracer(muzzlePosition, direction, 0xffd27a);
+  socket.emit("shoot", { direction: { x: direction.x, y: direction.y, z: direction.z } }, (result) => {
+    if (result?.hit) {
+      const hitDirection = result.direction
+        ? new THREE.Vector3(result.direction.x, result.direction.y, result.direction.z).normalize()
+        : direction;
+      const markerClass = result.killed ? "kill" : result.hitZone === "head" ? "headshot" : "hit";
+      $(".crosshair").classList.add(markerClass);
+      setTimeout(() => $(".crosshair")?.classList.remove(markerClass), result.killed ? 210 : 120);
+      impactSpark(hitDirection, result.distance);
+      reactEnemyHit(result.enemyId, result.hitZone);
+      playSound(result.killed ? "kill" : result.hitZone === "head" ? "headshot" : "hit");
+      showCombatConfirmation(
+        result.killed
+          ? result.hitZone === "head" ? "HEADSHOT · ELIMINATED" : "ELIMINATED"
+          : result.hitZone === "head" ? `HEADSHOT · ${result.damage}` : `HIT · ${result.damage}`,
+        markerClass
+      );
+    } else if (result?.ok && result.impact === "cover") {
+      const impactDirection = result.direction
+        ? new THREE.Vector3(result.direction.x, result.direction.y, result.direction.z).normalize()
+        : direction;
+      impactSpark(impactDirection, result.distance);
+    } else if (result?.reason === "Empty") {
+      dryFire();
+    } else if (result && !result.ok && result.reason !== "Fire rate") {
+      toast(result.reason?.toUpperCase() || "SHOT REJECTED", "warning");
+    }
+  });
+}
+function dryFire() {
+  const now = performance.now();
+  if (now - lastDryFire < 240) return;
+  lastDryFire = now;
+  playSound("dry");
+  recoil = Math.min(1, recoil + .035);
+  $(".crosshair").classList.add("dry");
+  setTimeout(() => $(".crosshair")?.classList.remove("dry"), 150);
+  showCombatConfirmation("MAGAZINE EMPTY · R", "dry");
+}
+function showCombatConfirmation(text, kind = "hit") {
+  const confirmation = $(".combat-confirm");
+  confirmation.textContent = text;
+  confirmation.className = `combat-confirm ${kind} active`;
+  clearTimeout(showCombatConfirmation.timer);
+  showCombatConfirmation.timer = setTimeout(() => {
+    if (confirmation) confirmation.className = "combat-confirm";
+  }, kind === "kill" ? 900 : 620);
+}
+function ejectShell() {
+  let shell = shellPool.find((item) => !item.visible);
+  if (!shell) {
+    shell = new THREE.Mesh(
+      new THREE.CylinderGeometry(.018, .018, .075, 7),
+      new THREE.MeshStandardMaterial({ color: 0xc99648, metalness: .9, roughness: .25 })
+    );
+    shellPool.push(shell); scene.add(shell);
+  }
+  shell.position.set(.45, -.29, -1.09).applyMatrix4(camera.matrixWorld);
+  const velocity = new THREE.Vector3(2.2 + Math.random(), 1.7 + Math.random(), .1).applyQuaternion(camera.quaternion);
+  shell.userData.velocity = velocity;
+  shell.userData.life = .85;
+  shell.userData.bounced = false;
+  shell.visible = true;
+}
+function ejectMagazine() {
+  let dropped = magazinePool.find((item) => !item.visible);
+  if (!dropped) {
+    if (magazinePool.length >= 8) {
+      dropped = magazinePool.reduce((oldest, item) =>
+        item.userData.spawnedAt < oldest.userData.spawnedAt ? item : oldest);
     } else {
-
-        closeEditor();
-
+      dropped = weaponMagazine.clone();
+      dropped.material = weaponMagazineMaterial.clone();
+      dropped.userData.velocity = new THREE.Vector3();
+      magazinePool.push(dropped);
+      scene.add(dropped);
     }
-
-
-    updateNotesTitle();
-
+  }
+  dropped.material.color.copy(weaponMagazineMaterial.color);
+  weaponMagazine.getWorldPosition(dropped.position);
+  weaponMagazine.getWorldQuaternion(dropped.quaternion);
+  dropped.userData.velocity.set(-1.1, 1.15, .45).applyQuaternion(camera.quaternion);
+  dropped.userData.spawnedAt = performance.now();
+  dropped.userData.life = 2.4;
+  dropped.userData.bounced = false;
+  dropped.userData.resting = false;
+  dropped.visible = true;
 }
-
-
-function updateNotesTitle() {
-
-    const title =
-        document.getElementById(
-            "notesTitle"
-        );
-
-
-    if (
-        currentFolderId === "all"
-    ) {
-
-        title.textContent =
-            "All notes";
-
-        return;
-
+function flashPointLight(position, color, peak = 3.5, life = 110) {
+  let light = transientLightPool.find((item) => item.intensity <= 0);
+  if (!light) {
+    if (transientLightPool.length >= (qualityLow ? 2 : 6)) {
+      light = transientLightPool.reduce((oldest, item) =>
+        item.userData.started < oldest.userData.started ? item : oldest);
+    } else {
+      light = new THREE.PointLight(color, 0, qualityLow ? 2.8 : 4.5, 2);
+      transientLightPool.push(light);
+      scene.add(light);
     }
-
-
-    const folder =
-        data.folders.find(
-            f =>
-                f.id ===
-                currentFolderId
-        );
-
-
-    title.textContent =
-        folder
-            ? folder.name
-            : "All notes";
-
+  }
+  light.color.set(color);
+  light.position.copy(position);
+  light.userData.started = performance.now();
+  light.userData.life = life;
+  light.userData.peak = peak;
+  light.intensity = peak;
 }
-
-
-/* =====================================================
-   UTILITIES
-===================================================== */
-
-function formatDate(timestamp) {
-
-    const date =
-        new Date(timestamp);
-
-
-    const now =
-        new Date();
-
-
-    const diff =
-        now - date;
-
-
-    const minutes =
-        Math.floor(
-            diff / 60000
-        );
-
-
-    if (minutes < 1)
-        return "just now";
-
-    if (minutes < 60)
-        return `${minutes}m ago`;
-
-
-    const hours =
-        Math.floor(
-            minutes / 60
-        );
-
-
-    if (hours < 24)
-        return `${hours}h ago`;
-
-
-    const days =
-        Math.floor(
-            hours / 24
-        );
-
-
-    if (days < 7)
-        return `${days}d ago`;
-
-
-    return date.toLocaleDateString();
-
-}
-
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-updateUI();
-
-</script>
-
-</body>
-</html>
-
-
+function spawnCombatBurst(position, color, direction = { x: 0, y: 1, z: 0 }, intensity = 1, dust = true) {
+  let burst = combatBurstPool.find((item) => !item.visible);
+  if (!burst) {
+    if (combatBurstPool.length >= (qualityLow ? 4 : 12)) {
+      burst = combatBurstPool.reduce((oldest, item) =>
+        item.userData.started < oldest.userData.started ? item : oldest);
+    } else {
+      const count = qualityLow ? 3 : 6;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      const points = new THREE.Points(geometry, new THREE.PointsMaterial({
+        color, size: qualityLow ? .055 : .075, transparent: true, opacity: .75,
+        blending: THREE.NormalBlending, depthWrite: false, sizeAttenuation: true
+      }));
+      const dustRing = new THREE.Mesh(
+        new THREE.RingGeometry(.05, .18, qualityLow ? 8 : 16),
+        new THREE.MeshBasicMaterial({
+          color: 0x8d7760, transparent: true, opacity: .3, depthWrite: false,
+          side: THREE.DoubleSide
+        })
+      );
+      dustRing.rotation.x = -Math.PI / 2;
+      burst = new THREE.Group();
+      burst.add(points, dustRing);
+      burst.userData = {
+        points, dust: dustRing, positions, velocities: Array.from({ length: count }, () => new THREE.Vector3()),
+        started: 0, life: .45
+      };
+      combatBurstPool.push(burst);
+      scene.add(burst);
+    }
+  }
+  const normal = new THREE.Vector3(direction.x, direction.y, direction.z).normalize();
+  burst.position.copy(position);
+  burst.userData.points.material.color.set(color);
+  burst.userData.dust.visible = dust;
+  burst.userData.dust.scale.setScalar(1);
+  for (let i = 0; i < burst.userData.velocities.length; i++) {
+    const spread = new THREE.Vector3(
+      (Math.random() - .5) * 2.8,
+      Math.random() * 2.8 + .25,
+      (Math.random() - .5) * 2.8
+    );
+    burst.userData.velocities[i].copy(normal).multiplyScalar(-Math.random() * 2.2).add(spread).multiplyScalar(intensity);
+    burst.userData.positions[i * 3] = 0;
+    burst.userData.positions[i * 3 + 1] = 0;
+    burst.userData.positions[i * 3 + 2] = 0;
+  }
+  burst.userData.points.geometry.attributes.position.needsUpdate = true;
+  burst.userData.started = perform
